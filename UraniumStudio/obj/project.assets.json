@@ -179,11 +179,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudio\\UraniumStudio.csproj",
+      "projectUniqueName": "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudio\\UraniumStudio.csproj",
       "projectName": "UraniumStudio",
-      "projectPath": "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudio\\UraniumStudio.csproj",
+      "projectPath": "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudio\\UraniumStudio.csproj",
       "packagesPath": "C:\\Users\\1\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudio\\obj\\",
+      "outputPath": "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudio\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\1\\AppData\\Roaming\\NuGet\\NuGet.Config"

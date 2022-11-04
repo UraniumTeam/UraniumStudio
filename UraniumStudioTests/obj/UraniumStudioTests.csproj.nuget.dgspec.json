@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj": {}
+    "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj": {
+    "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj",
+        "projectUniqueName": "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj",
         "projectName": "UraniumStudioTests",
-        "projectPath": "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj",
+        "projectPath": "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj",
         "packagesPath": "C:\\Users\\1\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudioTests\\obj\\",
+        "outputPath": "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudioTests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\1\\AppData\\Roaming\\NuGet\\NuGet.Config"

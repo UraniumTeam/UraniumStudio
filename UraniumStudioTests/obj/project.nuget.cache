@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "cBwiSEBTZXhIhi7pJrfVgkTKs1hhxt3+HIBHktFzu6L9DpSMu858PPbLEVCS2+OuLL6+YMLUqZKw1FDShXGdgg==",
+  "dgSpecHash": "cdAehazCu+P3sWpuQU/6rb6MX/zq9rxH8bE//TzwCm14LIE27hDLyLg15enrdwcRVnM741n/EVSSMgdJqHl3hw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\1\\RiderProjects\\1\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj",
+  "projectFilePath": "C:\\Users\\1\\RiderProjects\\UraniumStudio\\UraniumStudioTests\\UraniumStudioTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\1\\.nuget\\packages\\dirkster.avalondock\\4.70.2\\dirkster.avalondock.4.70.2.nupkg.sha512",
     "C:\\Users\\1\\.nuget\\packages\\dirkster.avalondock.themes.vs2013\\4.70.2\\dirkster.avalondock.themes.vs2013.4.70.2.nupkg.sha512"
