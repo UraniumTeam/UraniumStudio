@@ -2,13 +2,13 @@
 
 namespace UraniumStudio.Model;
 
-public record Function(int StartPosX, int PosY, int Length, string Name, Color Color)
+public record Function(int StartPosX, int RowPosY, int Length, string? Name, Color Color)
 {
-	public int StartPosX = StartPosX;
-	public int PosY = PosY;
-	public const int Width = 30;
-	public int Length = Length;
-	public string Name;
+	public const int Height = 30;
+	public readonly int StartPosX = StartPosX;
+	public readonly int RowPosY = RowPosY;
+	public readonly int Length = Length;
+	public readonly string? Name = Name;
 
 	public Color Color = Color;
 }
