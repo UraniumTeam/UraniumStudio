@@ -73,6 +73,7 @@
                             <Canvas x:Name="CanvasFunctions" Background="Bisque">
                                 <ItemsControl ItemsSource="{Binding FunctionsToRender}"
                                               HorizontalContentAlignment="Left" VerticalAlignment="Top"
+                                              Focusable="True"
                                               PreviewMouseLeftButtonDown="CanvasItem_OnPreviewMouseLeftButtonDown">
                                 </ItemsControl>
                             </Canvas>

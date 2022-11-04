@@ -24,6 +24,7 @@ public static class Renderer
 			Canvas.SetTop(funcName, functions[i].RowPosY * Function.Height);
 			canvas.Children.Add(rectangles[i]);
 			canvas.Children.Add(funcName);
+			canvas.Name = rectangles[i].Name;
 			canvases[i] = canvas;
 		}
 
@@ -41,7 +42,7 @@ public static class Renderer
 				Fill = new SolidColorBrush(functions[i].Color),
 				Width = functions[i].Length,
 				Height = Function.Height,
-				///
+				Name = functions[i].Name
 			};
 		}
 
