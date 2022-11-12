@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -17,7 +16,7 @@ public static class Renderer
 		{
 			var canvas = new Canvas();
 			var funcName = new TextBlock { Text = functions[i].Name };
-			
+
 			Canvas.SetLeft(rectangles[i], functions[i].StartPosX);
 			Canvas.SetLeft(funcName, functions[i].StartPosX);
 			Canvas.SetTop(rectangles[i], functions[i].RowPosY * Function.Height);

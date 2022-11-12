@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace UraniumStudio.Utilities;
 
-public class Utilities
+public static class Utilities
 {
 	public static Color GetRandomColor()
 	{
