@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -9,7 +8,7 @@ namespace UraniumStudio.ViewModel;
 
 public static class Renderer
 {
-	public static Canvas[] GetGrids(List<Function> functions)
+	public static Canvas[] GetCanvasesArray(List<Function> functions)
 	{
 		var rectangles = ConvertFunctionsToRectangles(functions);
 		var canvases = new Canvas[functions.Count];
@@ -17,7 +16,7 @@ public static class Renderer
 		{
 			var canvas = new Canvas();
 			var funcName = new TextBlock { Text = functions[i].Name };
-			
+
 			Canvas.SetLeft(rectangles[i], functions[i].StartPosX);
 			Canvas.SetLeft(funcName, functions[i].StartPosX);
 			Canvas.SetTop(rectangles[i], functions[i].RowPosY * Function.Height);
