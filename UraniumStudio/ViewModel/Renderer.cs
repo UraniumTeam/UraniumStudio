@@ -8,7 +8,7 @@ namespace UraniumStudio.ViewModel;
 
 public static class Renderer
 {
-	public static Canvas[] GetGrids(List<Function> functions)
+	public static Canvas[] GetCanvasesArray(List<Function> functions)
 	{
 		var rectangles = ConvertFunctionsToRectangles(functions);
 		var canvases = new Canvas[functions.Count];

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Effects;
+using UraniumStudio.Data;
 using Point = System.Windows.Point;
 
 namespace UraniumStudio.View;
@@ -23,7 +24,9 @@ public partial class MainWindow
 
 	void FileOpen_OnPreviewLeftButtonDown(object sender, MouseButtonEventArgs e)
 	{
-		new Microsoft.Win32.OpenFileDialog().ShowDialog();
+		var dialog = new Microsoft.Win32.OpenFileDialog();
+		dialog.ShowDialog();
+		FileParser.Parser(dialog.FileName);
 	}
 
 	void CanvasItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

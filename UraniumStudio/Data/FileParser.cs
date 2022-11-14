@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Media;
 using UraniumStudio.Model;
 using static UraniumStudio.Utilities.Utilities;
@@ -18,6 +19,11 @@ public class FileParser
 		new Function(400, 7, 200, "F200", Colors.Green),
 		new Function(300, 6, 400, "F400", Colors.Indigo)
 	};
+
+	public static void Parser(string path)
+	{
+		byte[] file = File.ReadAllBytes(path);
+	}
 
 	public static void GenerateRandomFunctions(int count)
 	{

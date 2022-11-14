@@ -11,6 +11,6 @@ public class MainWindowVM
 	{
 		var fileParser = new FileParser();
 		//FileParser.GenerateRandomFunctions(100000);
-		FunctionsToRender = Renderer.GetGrids(FileParser.Functions);
+		FunctionsToRender = Renderer.GetCanvasesArray(FileParser.Functions);
 	}
 }
