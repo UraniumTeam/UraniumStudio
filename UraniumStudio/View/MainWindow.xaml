@@ -30,7 +30,7 @@
             </Button>
 
         </StackPanel>
-        
+
         <DockingManager Grid.Row="1"
                         x:Name="DockingManager"
                         IsVirtualizingAnchorable="True"
@@ -49,7 +49,7 @@
                             <LayoutAnchorable x:Name="Stats"
                                               CanClose="False" Title="Stats"
                                               AutoHideMinWidth="200"
-                                              AutoHideMinHeight="100" >
+                                              AutoHideMinHeight="100">
 
                                 <StackPanel x:Name="InfoStackPanel" Background="Wheat">
 
@@ -76,20 +76,21 @@
                                     MouseDown="CanvasFunctionsPanel_OnMouseDown"
                                     MouseMove="CanvasFunctionsPanel_OnMouseMove"
                                     MouseUp="CanvasFunctionsPanel_OnMouseUp">
-                                
+
                                 <Canvas.LayoutTransform>
                                     <ScaleTransform x:Name="ScaleTransform" />
                                 </Canvas.LayoutTransform>
-                                
+
                                 <Line x:Name="Timeline" X1="0" Y1="15" Y2="15" StrokeThickness="5"
                                       X2="{Binding Width, ElementName=CanvasItems}" Fill="Black" />
 
-                                <ItemsControl x:Name="CanvasItems" ItemsSource="{Binding FunctionsToRender}"
+                                <ItemsControl x:Name="CanvasItems"
+                                              ItemsSource="{Binding FunctionsToRender, UpdateSourceTrigger=PropertyChanged}"
                                               HorizontalContentAlignment="Left" VerticalAlignment="Top"
                                               Focusable="True"
                                               PreviewMouseLeftButtonDown="CanvasItem_OnPreviewMouseLeftButtonDown">
                                 </ItemsControl>
-                                
+
                             </Canvas>
                         </LayoutDocument>
                     </LayoutDocumentPane>

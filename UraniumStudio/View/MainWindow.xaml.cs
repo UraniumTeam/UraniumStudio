@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Effects;
 using UraniumStudio.Data;
+using UraniumStudio.ViewModel;
 using Point = System.Windows.Point;
 
 namespace UraniumStudio.View;
@@ -13,6 +14,7 @@ public partial class MainWindow
 	Point _targetPoint;
 	FrameworkElement? _targetElement;
 	UIElement? _selectedElement;
+
 
 	public MainWindow()
 	{
@@ -24,9 +26,16 @@ public partial class MainWindow
 
 	void FileOpen_OnPreviewLeftButtonDown(object sender, MouseButtonEventArgs e)
 	{
-		var dialog = new Microsoft.Win32.OpenFileDialog();
+		var dialog = new Microsoft.Win32.OpenFileDialog
+		{
+			Filter = "Файлы UPS |*.UPS"
+		};
 		dialog.ShowDialog();
-		FileParser.Parser(dialog.FileName);
+
+		if (Database.Functions.Count > 0)
+			Database.Functions.Clear();
+		Database.Functions.AddRange(FileParser.ParseFile(dialog.FileName));
+		DataContext = new MainWindowVM();
 	}
 
 	void CanvasItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

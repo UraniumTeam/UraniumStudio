@@ -9,8 +9,6 @@ public class MainWindowVM
 
 	public MainWindowVM()
 	{
-		var fileParser = new FileParser();
-		//FileParser.GenerateRandomFunctions(100000);
-		FunctionsToRender = Renderer.GetCanvasesArray(FileParser.Functions);
+		FunctionsToRender = Renderer.GetCanvasesArray(Database.Functions);
 	}
 }
