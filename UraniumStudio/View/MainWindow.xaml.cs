@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Effects;
+using System.Windows.Shapes;
 using UraniumStudio.Data;
 using UraniumStudio.ViewModel;
 using Point = System.Windows.Point;
@@ -15,10 +16,10 @@ public partial class MainWindow
 	FrameworkElement? _targetElement;
 	UIElement? _selectedElement;
 
-
 	public MainWindow()
 	{
 		InitializeComponent();
+		//ScaleTransform.ScaleX = 0.001;
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
@@ -28,7 +29,7 @@ public partial class MainWindow
 	{
 		var dialog = new Microsoft.Win32.OpenFileDialog
 		{
-			Filter = "Файлы UPS |*.UPS"
+			Filter = "Файлы UPT |*.UPT"
 		};
 		dialog.ShowDialog();
 
@@ -36,12 +37,16 @@ public partial class MainWindow
 			Database.Functions.Clear();
 		Database.Functions.AddRange(FileParser.ParseFile(dialog.FileName));
 		DataContext = new MainWindowVM();
+		InfoStackPanel.Children.Clear();
 	}
 
 	void CanvasItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 	{
 		if (_selectedElement != null) _selectedElement.Effect = null;
+		//if (_selectedElement is not Rectangle) return;
+
 		_selectedElement = e.OriginalSource as FrameworkElement;
+		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
 
 		InfoStackPanel.Children.Clear();
@@ -53,8 +58,8 @@ public partial class MainWindow
 
 	void MainWindow_OnMouseWheel(object sender, MouseWheelEventArgs e)
 	{
-		const double minScale = 0.3;
-		const double maxScale = 1.3;
+		const double minScale = 0;
+		const double maxScale = 10;
 		const double scaleMultiplier = (double)1 / 3500;
 
 		double absDelta = Math.Abs(e.Delta * scaleMultiplier);
@@ -69,19 +74,19 @@ public partial class MainWindow
 		    (ScaleTransform.ScaleX < maxScale || ScaleTransform.ScaleY < maxScale))
 		{
 			ScaleTransform.ScaleX += direction * absDelta;
-			ScaleTransform.ScaleY += direction * absDelta;
+			//ScaleTransform.ScaleY += direction * absDelta;
 		}
 
 		if (ScaleTransform.ScaleX <= minScale || ScaleTransform.ScaleY <= minScale)
 		{
 			ScaleTransform.ScaleX += absDelta;
-			ScaleTransform.ScaleY += absDelta;
+			//ScaleTransform.ScaleY += absDelta;
 		}
 
 		if (ScaleTransform.ScaleX >= maxScale || ScaleTransform.ScaleY >= maxScale)
 		{
 			ScaleTransform.ScaleX -= absDelta;
-			ScaleTransform.ScaleY -= absDelta;
+			//ScaleTransform.ScaleY -= absDelta;
 		}
 	}
 
@@ -113,4 +118,5 @@ public partial class MainWindow
 	{
 		_targetElement = null;
 	}
+
 }
