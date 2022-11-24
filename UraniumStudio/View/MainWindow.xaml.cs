@@ -60,7 +60,7 @@ public partial class MainWindow
 	{
 		const double minScale = 0;
 		const double maxScale = 10;
-		const double scaleMultiplier = (double)1 / 3500;
+		const double scaleMultiplier = (double)1 / 2000;
 
 		double absDelta = Math.Abs(e.Delta * scaleMultiplier);
 		sbyte direction = e.Delta switch
@@ -70,24 +70,9 @@ public partial class MainWindow
 			_ => 0
 		};
 
-		if ((ScaleTransform.ScaleX > minScale || ScaleTransform.ScaleY > minScale) &&
-		    (ScaleTransform.ScaleX < maxScale || ScaleTransform.ScaleY < maxScale))
-		{
-			ScaleTransform.ScaleX += direction * absDelta;
-			//ScaleTransform.ScaleY += direction * absDelta;
-		}
-
-		if (ScaleTransform.ScaleX <= minScale || ScaleTransform.ScaleY <= minScale)
-		{
-			ScaleTransform.ScaleX += absDelta;
-			//ScaleTransform.ScaleY += absDelta;
-		}
-
-		if (ScaleTransform.ScaleX >= maxScale || ScaleTransform.ScaleY >= maxScale)
-		{
-			ScaleTransform.ScaleX -= absDelta;
-			//ScaleTransform.ScaleY -= absDelta;
-		}
+		if (ScaleTransform.ScaleX is > minScale and < maxScale) ScaleTransform.ScaleX += direction * absDelta;
+		if (ScaleTransform.ScaleX <= minScale) ScaleTransform.ScaleX += absDelta;
+		if (ScaleTransform.ScaleX >= maxScale) ScaleTransform.ScaleX -= absDelta;
 	}
 
 	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -103,20 +88,11 @@ public partial class MainWindow
 		var pCanvas = e.GetPosition(CanvasFunctionsPanel);
 
 		double xOffset = pCanvas.X - _targetPoint.X;
-		double yOffset = pCanvas.Y - _targetPoint.Y;
-
-		if (yOffset <= Canvas.GetTop(CanvasFunctionsPanel)) // Top Border
-			yOffset = Canvas.GetTop(CanvasFunctionsPanel);
-		//if (xOffset <= Canvas.GetLeft(CanvasFunctionsPanel)) // Left border
-		//	xOffset = Canvas.GetLeft(CanvasFunctionsPanel);
-
 		Canvas.SetLeft(_targetElement, xOffset);
-		Canvas.SetTop(_targetElement, yOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)
 	{
 		_targetElement = null;
 	}
-
 }
