@@ -8,10 +8,10 @@ namespace UraniumStudio.ViewModel;
 
 public static class Renderer
 {
-	public static Canvas[] GetCanvasesArray(List<Function> functions)
+	public static Canvas[] GetCanvasesArray(List<Function>? functions)
 	{
 		var rectangles = ConvertFunctionsToRectangles(functions);
-		var canvases = new Canvas[functions.Count];
+		var canvases = new Canvas[functions!.Count];
 		for (int i = 0; i < canvases.Length; i++)
 		{
 			var canvas = new Canvas();
@@ -30,9 +30,9 @@ public static class Renderer
 		return canvases;
 	}
 
-	private static Rectangle[] ConvertFunctionsToRectangles(IReadOnlyList<Function> functions)
+	private static Rectangle[] ConvertFunctionsToRectangles(IReadOnlyList<Function>? functions)
 	{
-		var rectangles = new Rectangle[functions.Count];
+		var rectangles = new Rectangle[functions!.Count];
 		for (int i = 0; i < rectangles.Length; i++)
 		{
 			rectangles[i] = new Rectangle()

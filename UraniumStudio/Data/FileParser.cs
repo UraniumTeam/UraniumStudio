@@ -1,39 +1,113 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Media;
+using System.Linq;
+using System.Text;
 using UraniumStudio.Model;
-using static UraniumStudio.Utilities.Utilities;
+using static UraniumStudio.Utilities.Color;
 
 namespace UraniumStudio.Data;
 
-public class FileParser
+public static class FileParser
 {
-	public static readonly List<Function> Functions = new()
+	public static List<Function> ParseFile(string path)
 	{
-		new Function(0, 1, 1000, "F1000", Colors.Aqua),
-		new Function(50, 2, 200, "F200", Colors.Red),
-		new Function(10, 3, 500, "F500", Colors.Chartreuse),
-		new Function(30, 4, 222, "F222", Colors.Blue),
-		new Function(40, 5, 100, "F100", Colors.Gray),
-		new Function(400, 7, 200, "F200", Colors.Green),
-		new Function(300, 6, 400, "F400", Colors.Indigo)
-	};
+		byte[] data = File.ReadAllBytes(path);
+		int cursor = 0;
+		double nsInTick = BitConverter.ToDouble(data, cursor);
+		cursor += 8;
+		uint funcNamesCount = BitConverter.ToUInt32(data, cursor);
+		cursor += 4;
 
-	public static void Parser(string path)
-	{
-		byte[] file = File.ReadAllBytes(path);
-	}
+		var funcNames = new string[funcNamesCount];
+		var eventsTuples = new List<Tuple<Event, Event>>();
 
-	public static void GenerateRandomFunctions(int count)
-	{
-		var rnd = new Random();
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < funcNamesCount; i++)
 		{
-			int length = rnd.Next(10, 10000);
-			Functions.Add(
-				new Function(
-					rnd.Next(10000), rnd.Next(1, 100), length, "F" + length, GetRandomColor()));
+			ushort countLettersInFuncName = BitConverter.ToUInt16(data, cursor);
+			cursor += 2;
+			byte[] dataSliceFuncName = data.Skip(cursor).Take(countLettersInFuncName).ToArray();
+			cursor += countLettersInFuncName;
+			funcNames[i] = Encoding.ASCII.GetString(dataSliceFuncName);
 		}
+
+		uint eventsCount = BitConverter.ToUInt32(data, cursor);
+		cursor += 4;
+		for (int i = 0; i < eventsCount / 2; i++)
+		{
+			uint indexBegin = BitConverter.ToUInt32(data, cursor);
+			cursor += 4;
+			ulong tickTimestampBegin = BitConverter.ToUInt64(data, cursor);
+			cursor += 8;
+			var eventBegin = new Event(indexBegin, tickTimestampBegin);
+
+			uint indexEnd = BitConverter.ToUInt32(data, cursor);
+			cursor += 4;
+			ulong tickTimestampEnd = BitConverter.ToUInt64(data, cursor);
+			cursor += 8;
+			var eventEnd = new Event(indexEnd, tickTimestampEnd);
+			eventsTuples.Add(new Tuple<Event, Event>(eventBegin, eventEnd));
+		}
+
+		double minX = eventsTuples.Min(e => e.Item1.TickTimestamp);
+		foreach (var e in eventsTuples)
+		{
+			e.Item1.TickTimestamp -= (ulong)minX;
+			e.Item2.TickTimestamp -= (ulong)minX;
+		}
+
+		var functions = new List<Function>();
+		var rows = new Dictionary<uint, double>();
+		for (int i = 0; i < eventsTuples.Count; i++)
+		{
+			double timeBeginMs = eventsTuples[i].Item1.TickTimestamp * nsInTick / 1000000;
+			double timeEndMs = eventsTuples[i].Item2.TickTimestamp * nsInTick / 1000000;
+			double funcLengthMs = timeEndMs - timeBeginMs;
+			uint currentRowPosY = eventsTuples[i].Item1.Index;
+			if (rows.ContainsKey(currentRowPosY))
+			{
+				if (rows[currentRowPosY] < timeBeginMs)
+				{
+					rows[currentRowPosY] = timeEndMs;
+					functions.Add(
+						new Function(
+							funcNames[(int)eventsTuples[i].Item1.Index], timeBeginMs, (int)currentRowPosY,
+							funcLengthMs, GetRandomColor()));
+				}
+				else
+				{
+					bool stop = false;
+					while (rows.TryGetValue(currentRowPosY, out double value) && !stop)
+					{
+						if (value < timeBeginMs)
+							stop = true;
+						else
+						{
+							currentRowPosY++;
+						}
+					}
+
+					if (stop == false)
+						rows.Add(currentRowPosY, timeEndMs);
+
+					functions.Add(
+						new Function(
+							funcNames[(int)eventsTuples[i].Item1.Index], timeBeginMs,
+							(int)currentRowPosY,
+							funcLengthMs, GetRandomColor()));
+				}
+			}
+
+			else
+			{
+				rows.Add(currentRowPosY, timeEndMs);
+				functions.Add(
+					new Function(
+						funcNames[(int)eventsTuples[i].Item1.Index], timeBeginMs, (int)currentRowPosY,
+						funcLengthMs, GetRandomColor()));
+			}
+		}
+
+		return functions.ToList();
 	}
 }
