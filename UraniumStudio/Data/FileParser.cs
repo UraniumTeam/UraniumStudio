@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Media;
 using UraniumStudio.Model;
-using static UraniumStudio.Utilities.Utilities;
+using static UraniumStudio.Utilities.Color;
 
 namespace UraniumStudio.Data;
 
@@ -15,55 +14,100 @@ public static class FileParser
 	{
 		byte[] data = File.ReadAllBytes(path);
 		int cursor = 0;
-		ulong nsInTick = BitConverter.ToUInt64(data, cursor);
+		double nsInTick = BitConverter.ToDouble(data, cursor);
 		cursor += 8;
-		uint funcsCount = BitConverter.ToUInt32(data, cursor);
+		uint funcNamesCount = BitConverter.ToUInt32(data, cursor);
 		cursor += 4;
 
-		var funcs = new List<Tuple<string, int>>();
-		var events = new List<Event>();
+		var funcNames = new string[funcNamesCount];
+		var eventsTuples = new List<Tuple<Event, Event>>();
 
-		for (int i = 0; i < funcsCount; i++)
+		for (int i = 0; i < funcNamesCount; i++)
 		{
 			ushort countLettersInFuncName = BitConverter.ToUInt16(data, cursor);
 			cursor += 2;
 			byte[] dataSliceFuncName = data.Skip(cursor).Take(countLettersInFuncName).ToArray();
 			cursor += countLettersInFuncName;
-			funcs.Add(new Tuple<string, int>(Encoding.ASCII.GetString(dataSliceFuncName), dataSliceFuncName.Length));
+			funcNames[i] = Encoding.ASCII.GetString(dataSliceFuncName);
 		}
 
-		uint eventsCount = BitConverter.ToUInt32(data, cursor) * 2;
+		uint eventsCount = BitConverter.ToUInt32(data, cursor);
 		cursor += 4;
-		for (int i = 0; i < eventsCount; i++)
+		for (int i = 0; i < eventsCount / 2; i++)
 		{
-			ushort index = BitConverter.ToUInt16(data, cursor);
-			cursor += 2;
-			ushort state = BitConverter.ToUInt16(data, cursor);
-			cursor += 2;
-			ulong tickTimestamp = BitConverter.ToUInt64(data, cursor);
+			uint indexBegin = BitConverter.ToUInt32(data, cursor);
+			cursor += 4;
+			ulong tickTimestampBegin = BitConverter.ToUInt64(data, cursor);
 			cursor += 8;
-			events.Add(new Event(index, state, tickTimestamp));
+			var eventBegin = new Event(indexBegin, tickTimestampBegin);
+
+			uint indexEnd = BitConverter.ToUInt32(data, cursor);
+			cursor += 4;
+			ulong tickTimestampEnd = BitConverter.ToUInt64(data, cursor);
+			cursor += 8;
+			var eventEnd = new Event(indexEnd, tickTimestampEnd);
+			eventsTuples.Add(new Tuple<Event, Event>(eventBegin, eventEnd));
+		}
+
+		double minX = eventsTuples.Min(e => e.Item1.TickTimestamp);
+		foreach (var e in eventsTuples)
+		{
+			e.Item1.TickTimestamp -= (ulong)minX;
+			e.Item2.TickTimestamp -= (ulong)minX;
 		}
 
 		var functions = new List<Function>();
-		const int experimentTickTime = 2;
-		foreach (var func in funcs)
+		var rows = new Dictionary<uint, double>();
+		for (int i = 0; i < eventsTuples.Count; i++)
 		{
-			var funcEvents = new List<Event>();
-			foreach (var e in events)
+			double timeBeginMs = eventsTuples[i].Item1.TickTimestamp * nsInTick / 1000000;
+			double timeEndMs = eventsTuples[i].Item2.TickTimestamp * nsInTick / 1000000;
+			double funcLengthMs = timeEndMs - timeBeginMs;
+			uint currentRowPosY = eventsTuples[i].Item1.Index;
+			if (rows.ContainsKey(currentRowPosY))
 			{
-				if (e.Index == funcs.IndexOf(func))
-					funcEvents.Add(e);
+				if (rows[currentRowPosY] < timeBeginMs)
+				{
+					rows[currentRowPosY] = timeEndMs;
+					functions.Add(
+						new Function(
+							funcNames[(int)eventsTuples[i].Item1.Index], timeBeginMs, (int)currentRowPosY,
+							funcLengthMs, GetRandomColor()));
+				}
+				else
+				{
+					bool stop = false;
+					while (rows.TryGetValue(currentRowPosY, out double value) && !stop)
+					{
+						if (value < timeBeginMs)
+							stop = true;
+						else
+						{
+							currentRowPosY++;
+						}
+					}
+
+					if (stop == false)
+						rows.Add(currentRowPosY, timeEndMs);
+
+					functions.Add(
+						new Function(
+							funcNames[(int)eventsTuples[i].Item1.Index], timeBeginMs,
+							(int)currentRowPosY,
+							funcLengthMs, GetRandomColor()));
+				}
 			}
 
-			functions.Add(
-				new Function(
-					func.Item1, funcEvents, funcEvents.Find(e => e.State == 0).TickTimestamp / 1000000000000,
-					funcs.IndexOf(func),
-					(funcEvents.Find(e => e.State == 4096).TickTimestamp -
-					 funcEvents.Find(e => e.State == 0).TickTimestamp) / experimentTickTime, GetRandomColor()));
+			else
+			{
+				rows.Add(currentRowPosY, timeEndMs);
+				functions.Add(
+					new Function(
+						funcNames[(int)eventsTuples[i].Item1.Index], timeBeginMs, (int)currentRowPosY,
+						funcLengthMs, GetRandomColor()));
+			}
 		}
 
-		return functions;
+		return functions.ToList();
 	}
 }

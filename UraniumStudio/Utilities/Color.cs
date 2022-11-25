@@ -3,11 +3,11 @@ using System.Windows.Media;
 
 namespace UraniumStudio.Utilities;
 
-public static class Colors
+public static class Color
 {
-	public static Color GetRandomColor()
+	public static System.Windows.Media.Color GetRandomColor()
 	{
 		var rnd = new Random();
-		return Color.FromRgb((byte)rnd.Next(0, 255), (byte)rnd.Next(0, 255), (byte)rnd.Next(0, 255));
+		return System.Windows.Media.Color.FromRgb((byte)rnd.Next(0, 255), (byte)rnd.Next(0, 255), (byte)rnd.Next(0, 255));
 	}
 }
