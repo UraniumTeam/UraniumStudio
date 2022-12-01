@@ -64,7 +64,7 @@ public partial class MainWindow
 	{
 		const double minScale = 0;
 		const double maxScale = 100;
-		double scaleMultiplier = (double)1 / 5000 * ScaleTransform.ScaleX; //= (double)1 / 50000;
+		double scaleMultiplier = (double)1 / 5000 * FuncScaleTransform.ScaleX; //= (double)1 / 50000;
 
 		double absDelta = Math.Abs(e.Delta * scaleMultiplier);
 		sbyte direction = e.Delta switch
@@ -74,17 +74,27 @@ public partial class MainWindow
 			_ => 0
 		};
 
-		if (ScaleTransform.ScaleX is > minScale and < maxScale)
-			ScaleTransform.ScaleX += direction * absDelta;
-		if (ScaleTransform.ScaleX <= minScale) ScaleTransform.ScaleX += absDelta;
-		if (ScaleTransform.ScaleX >= maxScale) ScaleTransform.ScaleX -= absDelta;
+		if (FuncScaleTransform.ScaleX is > minScale and < maxScale)
+		{
+			FuncScaleTransform.ScaleX += direction * absDelta;
+			/**
+			 * TODO движение названий при скейле
+			 */
+			/*foreach (UIElement i in CanvasItemNames.Items)
+			{
+				i.TranslatePoint(new Point(Canvas.GetLeft(i) + direction * absDelta, Canvas.GetTop(i)), CanvasItems);
+			}*/
+		}
 
-		ScaleTransform.CenterX = e.GetPosition(CanvasItems).X;
+		if (FuncScaleTransform.ScaleX <= minScale) FuncScaleTransform.ScaleX += absDelta;
+		if (FuncScaleTransform.ScaleX >= maxScale) FuncScaleTransform.ScaleX -= absDelta;
+
+		//FuncScaleTransform.CenterX = e.GetPosition(CanvasItems).X; // CanvasItems
 	}
 
 	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
 	{
-		_targetElement = CanvasItems;
+		_targetElement = CanvasItems; // CanvasItems
 		if (_targetElement != null)
 			_targetPoint = e.GetPosition(_targetElement);
 	}
@@ -92,16 +102,17 @@ public partial class MainWindow
 	void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
 	{
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
-		var pCanvas = e.GetPosition(CanvasFunctionsPanel);
-
-		double xOffset = pCanvas.X - _targetPoint.X;
+		var pCanvas = e.GetPosition(CanvasFunctionsPanel); // CanvasFunctionPanel
+		
+		double xOffset = pCanvas.X - _targetPoint.X * FuncScaleTransform.ScaleX; // * FuncScaleTransform.ScaleX
 
 		//if (yOffset <= Canvas.GetTop(CanvasFunctionsPanel)) // Top Border  
 		//	yOffset = Canvas.GetTop(CanvasFunctionsPanel);					 
 		//if (xOffset <= Canvas.GetLeft(CanvasFunctionsPanel)) // Left border
 		//	xOffset = Canvas.GetLeft(CanvasFunctionsPanel);
-
-		Canvas.SetLeft(_targetElement, xOffset);
+		
+		Canvas.SetLeft(CanvasItems, xOffset);
+		Canvas.SetLeft(CanvasItemNames, xOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)
