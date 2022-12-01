@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
-using AvalonDock.Layout;
 using UraniumStudio.Data;
 using UraniumStudio.ViewModel;
 using Point = System.Windows.Point;
@@ -20,8 +19,8 @@ public partial class MainWindow
 	public MainWindow()
 	{
 		InitializeComponent();
-		Canvas.SetLeft(CanvasItems, 0);
-		Canvas.SetTop(CanvasItems, 0);
+		Canvas.SetLeft(CanvasFunctions, 0);
+		Canvas.SetTop(CanvasFunctions, 0);
 		//ScaleTransform.ScaleX = 0.0000001;
 	}
 
@@ -56,7 +55,7 @@ public partial class MainWindow
 		_selectedElement = e.OriginalSource as FrameworkElement;
 		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
-		
+
 		/**
 		 * TODO сделать таблицу данных о функции
 		 */
@@ -86,13 +85,13 @@ public partial class MainWindow
 		if (FuncScaleTransform.ScaleX is > minScale and < maxScale)
 		{
 			FuncScaleTransform.ScaleX += direction * absDelta;
-			/**
-			 * TODO движение названий при скейле
-			 */
-			/*foreach (UIElement i in CanvasItemNames.Items)
+			for (int i = 0; i < CanvasFunctionNames.Items.Count; i++)
 			{
-				i.TranslatePoint(new Point(Canvas.GetLeft(i) + direction * absDelta, Canvas.GetTop(i)), CanvasItems);
-			}*/
+				var name = (CanvasFunctionNames.Items[i] as Canvas)!.Children[0] as FrameworkElement;
+				var func = (CanvasFunctions.Items[i] as Canvas)!.Children[0] as FrameworkElement;
+				name!.MaxWidth = func!.ActualWidth * FuncScaleTransform.ScaleX;
+				Canvas.SetLeft(name, Canvas.GetLeft(func) * FuncScaleTransform.ScaleX);
+			}
 		}
 
 		if (FuncScaleTransform.ScaleX <= minScale) FuncScaleTransform.ScaleX += absDelta;
@@ -103,7 +102,7 @@ public partial class MainWindow
 
 	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
 	{
-		_targetElement = CanvasItems; // CanvasItems
+		_targetElement = CanvasFunctions; // CanvasItems
 		if (_targetElement != null)
 			_targetPoint = e.GetPosition(_targetElement);
 	}
@@ -112,16 +111,16 @@ public partial class MainWindow
 	{
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
 		var pCanvas = e.GetPosition(CanvasFunctionsPanel); // CanvasFunctionPanel
-		
+
 		double xOffset = pCanvas.X - _targetPoint.X * FuncScaleTransform.ScaleX; // * FuncScaleTransform.ScaleX
 
 		//if (yOffset <= Canvas.GetTop(CanvasFunctionsPanel)) // Top Border  
 		//	yOffset = Canvas.GetTop(CanvasFunctionsPanel);					 
 		//if (xOffset <= Canvas.GetLeft(CanvasFunctionsPanel)) // Left border
 		//	xOffset = Canvas.GetLeft(CanvasFunctionsPanel);
-		
-		Canvas.SetLeft(CanvasItems, xOffset);
-		Canvas.SetLeft(CanvasItemNames, xOffset);
+
+		Canvas.SetLeft(CanvasFunctions, xOffset);
+		Canvas.SetLeft(CanvasFunctionNames, xOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)

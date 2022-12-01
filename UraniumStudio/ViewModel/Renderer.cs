@@ -23,7 +23,7 @@ public static class Renderer
 
 			var funcName = new TextBlock
 			{
-				Text = functions[i].Name, TextWrapping = TextWrapping.NoWrap, MaxWidth = rectangles[i].Width
+				Text = functions[i].Name, MaxWidth = rectangles[i].Width
 			};
 
 			Canvas.SetLeft(rectangles[i], functions[i].StartPosX);
