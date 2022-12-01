@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
+using AvalonDock.Layout;
 using UraniumStudio.Data;
 using UraniumStudio.ViewModel;
 using Point = System.Windows.Point;
@@ -35,11 +36,16 @@ public partial class MainWindow
 		};
 
 		dialog.ShowDialog();
-		if (dialog.FileName == "")
-			return;
+		if (dialog.FileName == "") return;
 		if (Database.Functions.Count > 0)
 			Database.Functions.Clear();
 		Database.Functions.AddRange(FileParser.ParseFile(dialog.FileName));
+		/**
+		 * TODO сделать точку входа
+		 */
+		//var mainPanel = new LayoutDocumentPane {Children = {new LayoutDocument{Content = new Canvas().Children.Add()} }};
+		//MainPanel = mainPanel;
+		
 		DataContext = new MainWindowVM();
 		InfoStackPanel.Children.Clear();
 	}
@@ -50,7 +56,10 @@ public partial class MainWindow
 		_selectedElement = e.OriginalSource as FrameworkElement;
 		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
-
+		
+		/**
+		 * TODO сделать таблицу данных о функции
+		 */
 		InfoStackPanel.Children.Clear();
 		Stats.Show();
 		var element = e.OriginalSource as FrameworkElement;
