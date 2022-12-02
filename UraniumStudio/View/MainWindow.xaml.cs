@@ -39,9 +39,9 @@ public partial class MainWindow
 		if (Database.Functions.Count > 0)
 			Database.Functions.Clear();
 		Database.Functions.AddRange(FileParser.ParseFile(dialog.FileName));
-		/**
-		 * TODO сделать точку входа
-		 */
+		
+		//TODO сделать точку входа
+		 
 		//var mainPanel = new LayoutDocumentPane {Children = {new LayoutDocument{Content = new Canvas().Children.Add()} }};
 		//MainPanel = mainPanel;
 		
@@ -55,10 +55,9 @@ public partial class MainWindow
 		_selectedElement = e.OriginalSource as FrameworkElement;
 		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
-
-		/**
-		 * TODO сделать таблицу данных о функции
-		 */
+		
+		 //TODO сделать таблицу данных о функции
+		
 		InfoStackPanel.Children.Clear();
 		Stats.Show();
 		var element = e.OriginalSource as FrameworkElement;
