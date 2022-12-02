@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UraniumStudio.Model;
-using static UraniumStudio.Utilities.Color;
+using UraniumStudio.Utilities;
 
 namespace UraniumStudio.Data;
 
@@ -73,31 +73,26 @@ public static class FileParser
 		var rows = new Dictionary<uint, double>();
 		foreach (var (eventBegin, eventEnd) in eventsTuples)
 		{
-			double timeBeginMs = eventBegin.TickTimestamp * nsInTick / 1000000,
-				timeEndMs = eventEnd.TickTimestamp * nsInTick / 1000000;
+			double timeBeginMs = TimeConverter.TicksToMilliseconds(eventBegin.TickTimestamp, nsInTick),
+				timeEndMs = TimeConverter.TicksToMilliseconds(eventEnd.TickTimestamp, nsInTick);
 			double funcLengthMs = timeEndMs - timeBeginMs;
 			uint currentRowPosY = eventBegin.Index;
 			if (rows.ContainsKey(currentRowPosY))
-			{
 				if (rows[currentRowPosY] < timeBeginMs)
 				{
 					rows[currentRowPosY] = timeEndMs;
 					functions.Add(
 						new Function(
 							funcNames[(int)eventBegin.Index], timeBeginMs, (int)currentRowPosY,
-							funcLengthMs, GetRandomColor()));
+							funcLengthMs, Color.GetRandomColor()));
 				}
 				else
 				{
 					bool stop = false;
 					while (rows.TryGetValue(currentRowPosY, out double value) && !stop)
 					{
-						if (value < timeBeginMs)
-							stop = true;
-						else
-						{
-							currentRowPosY++;
-						}
+						if (value < timeBeginMs) stop = true;
+						else currentRowPosY++;
 					}
 
 					if (!stop) rows.Add(currentRowPosY, timeEndMs);
@@ -107,16 +102,15 @@ public static class FileParser
 						new Function(
 							funcNames[(int)eventBegin.Index], timeBeginMs,
 							(int)currentRowPosY,
-							funcLengthMs, GetRandomColor()));
+							funcLengthMs, Color.GetRandomColor()));
 				}
-			}
 			else
 			{
 				rows.Add(currentRowPosY, timeEndMs);
 				functions.Add(
 					new Function(
 						funcNames[(int)eventBegin.Index], timeBeginMs, (int)currentRowPosY,
-						funcLengthMs, GetRandomColor()));
+						funcLengthMs, Color.GetRandomColor()));
 			}
 		}
 
