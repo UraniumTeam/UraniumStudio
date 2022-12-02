@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -42,7 +41,7 @@ public static class Renderer
 		return new Tuple<Canvas[], Canvas[]>(functionCanvases, functionNameCanvases);
 	}
 
-	private static Rectangle[] ConvertFunctionsToRectangles(IReadOnlyList<Function>? functions)
+	static Rectangle[] ConvertFunctionsToRectangles(IReadOnlyList<Function>? functions)
 	{
 		var rectangles = new Rectangle[functions!.Count];
 		for (int i = 0; i < rectangles.Length; i++)
