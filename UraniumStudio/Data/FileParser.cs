@@ -89,6 +89,8 @@ public static class FileParser
 
 					if (stop == false)
 						rows.Add(currentRowPosY, timeEndMs);
+					else
+						rows[currentRowPosY] = timeEndMs;
 
 					functions.Add(
 						new Function(
