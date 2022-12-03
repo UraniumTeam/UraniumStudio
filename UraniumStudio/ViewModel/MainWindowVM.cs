@@ -7,8 +7,11 @@ public class MainWindowVM
 {
 	public Canvas[] FunctionsToRender { get; }
 
+	public Canvas[] FunctionNamesToRender { get; }
+
 	public MainWindowVM()
 	{
-		FunctionsToRender = Renderer.GetCanvasesArray(Database.Functions);
+		FunctionsToRender = Renderer.GetCanvasesArray(Database.Functions).Item1;
+		FunctionNamesToRender = Renderer.GetCanvasesArray(Database.Functions).Item2;
 	}
 }

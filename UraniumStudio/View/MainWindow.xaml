@@ -77,20 +77,28 @@
                                     MouseMove="CanvasFunctionsPanel_OnMouseMove"
                                     MouseUp="CanvasFunctionsPanel_OnMouseUp">
 
-                                <Canvas.LayoutTransform>
-                                    <ScaleTransform x:Name="ScaleTransform" />
-                                </Canvas.LayoutTransform>
-
                                 <Line x:Name="Timeline" X1="0" Y1="15" Y2="15" StrokeThickness="5"
-                                      X2="{Binding Width, ElementName=CanvasItems}" Fill="Black" />
+                                      X2="{Binding Width, ElementName=CanvasFunctions}" Fill="Black" />
 
-                                <ItemsControl x:Name="CanvasItems"
+                                <ItemsControl x:Name="CanvasFunctions"
                                               ItemsSource="{Binding FunctionsToRender, UpdateSourceTrigger=PropertyChanged}"
                                               HorizontalContentAlignment="Left" VerticalAlignment="Top"
                                               Focusable="True"
                                               PreviewMouseLeftButtonDown="CanvasItem_OnPreviewMouseLeftButtonDown">
+                                    <ItemsControl.LayoutTransform>
+                                        <ScaleTransform x:Name="FuncScaleTransform" />
+                                    </ItemsControl.LayoutTransform>
+                                    
                                 </ItemsControl>
 
+                                <ItemsControl x:Name="CanvasFunctionNames"
+                                              ItemsSource="{Binding FunctionNamesToRender, UpdateSourceTrigger=PropertyChanged}"
+                                              HorizontalAlignment="Left" VerticalAlignment="Top">
+                                    <ItemsControl.LayoutTransform>
+                                        <TranslateTransform x:Name="FuncNamesTranslateTransform" />
+                                    </ItemsControl.LayoutTransform>
+                                </ItemsControl>
+                                
                             </Canvas>
                         </LayoutDocument>
                     </LayoutDocumentPane>
