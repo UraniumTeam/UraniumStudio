@@ -9,9 +9,12 @@ public class MainWindowVM
 
 	public Canvas[] FunctionNamesToRender { get; }
 
+	public Canvas[] TimelineMarks { get; }
+	
 	public MainWindowVM()
 	{
 		FunctionsToRender = Renderer.GetCanvasesArray(Database.Functions).Item1;
 		FunctionNamesToRender = Renderer.GetCanvasesArray(Database.Functions).Item2;
+		TimelineMarks = Database.Marks.ToArray();
 	}
 }

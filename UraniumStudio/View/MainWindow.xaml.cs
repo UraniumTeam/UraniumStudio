@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,7 +21,6 @@ public partial class MainWindow
 	{
 		InitializeComponent();
 		Canvas.SetLeft(CanvasFunctions, 0);
-		Canvas.SetTop(CanvasFunctions, 0);
 		//ScaleTransform.ScaleX = 0.0000001;
 	}
 
@@ -38,13 +38,18 @@ public partial class MainWindow
 		if (dialog.FileName == "") return;
 		if (Database.Functions.Count > 0)
 			Database.Functions.Clear();
+		if (Database.Marks.Count > 0)
+			Database.Marks.Clear();
+
 		Database.Functions.AddRange(FileParser.ParseFile(dialog.FileName));
-		
+		Database.Marks = TimelineCreator.GetTimelineMarks(
+			Database.Functions.Last().StartPosX + Database.Functions.Last().Length, FuncScaleTransform.ScaleX).ToList();
+
 		//TODO сделать точку входа
-		 
+
 		//var mainPanel = new LayoutDocumentPane {Children = {new LayoutDocument{Content = new Canvas().Children.Add()} }};
 		//MainPanel = mainPanel;
-		
+
 		DataContext = new MainWindowVM();
 		InfoStackPanel.Children.Clear();
 	}
@@ -55,9 +60,9 @@ public partial class MainWindow
 		_selectedElement = e.OriginalSource as FrameworkElement;
 		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
-		
-		 //TODO сделать таблицу данных о функции
-		
+
+		//TODO сделать таблицу данных о функции
+
 		InfoStackPanel.Children.Clear();
 		Stats.Show();
 		var element = e.OriginalSource as FrameworkElement;
@@ -89,8 +94,30 @@ public partial class MainWindow
 				var name = (CanvasFunctionNames.Items[i] as Canvas)!.Children[0] as FrameworkElement;
 				var func = (CanvasFunctions.Items[i] as Canvas)!.Children[0] as FrameworkElement;
 				name!.MaxWidth = func!.ActualWidth * FuncScaleTransform.ScaleX;
+
 				Canvas.SetLeft(name, Canvas.GetLeft(func) * FuncScaleTransform.ScaleX);
+
+				/*if (i < TimelineMarks.Items.Count)
+				{
+					var mark = (TimelineMarks.Items[i] as Canvas)!.Children[0] as Line;
+					Canvas.SetLeft(mark,  10 * FuncScaleTransform.ScaleX);
+				}*/
 			}
+
+			/* Test changing marks while scaling
+				if (FuncScaleTransform.ScaleX > 2)
+				{
+					Database.Marks = new List<Canvas>();
+					TimelineMarks.ItemsSource = Database.Marks;
+				}*/
+			/*for (int i = 0; i < TimelineMarks.Items.Count; i++)
+			{
+				var mark = (TimelineMarks.Items[i] as Canvas)!.Children[0] as Line;
+				//mark.X1=mark.X2*=FuncScaleTransform
+				Canvas.SetLeft(mark, mark.X1 * FuncScaleTransform.ScaleX);
+				//mark.RenderSize.Width
+				
+			}*/
 		}
 
 		if (FuncScaleTransform.ScaleX <= minScale) FuncScaleTransform.ScaleX += absDelta;
@@ -101,7 +128,7 @@ public partial class MainWindow
 
 	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
 	{
-		_targetElement = CanvasFunctions; // CanvasItems
+		_targetElement = CanvasFunctions;
 		if (_targetElement != null)
 			_targetPoint = e.GetPosition(_targetElement);
 	}
@@ -109,9 +136,9 @@ public partial class MainWindow
 	void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
 	{
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
-		var pCanvas = e.GetPosition(CanvasFunctionsPanel); // CanvasFunctionPanel
+		var pCanvas = e.GetPosition(CanvasFunctionsPanel);
 
-		double xOffset = pCanvas.X - _targetPoint.X * FuncScaleTransform.ScaleX; // * FuncScaleTransform.ScaleX
+		double xOffset = pCanvas.X - _targetPoint.X * FuncScaleTransform.ScaleX;
 
 		//if (yOffset <= Canvas.GetTop(CanvasFunctionsPanel)) // Top Border  
 		//	yOffset = Canvas.GetTop(CanvasFunctionsPanel);					 
@@ -120,6 +147,7 @@ public partial class MainWindow
 
 		Canvas.SetLeft(CanvasFunctions, xOffset);
 		Canvas.SetLeft(CanvasFunctionNames, xOffset);
+		Canvas.SetLeft(TimelineMarks, xOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)

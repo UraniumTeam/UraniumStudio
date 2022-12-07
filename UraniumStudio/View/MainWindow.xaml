@@ -77,10 +77,20 @@
                                     MouseMove="CanvasFunctionsPanel_OnMouseMove"
                                     MouseUp="CanvasFunctionsPanel_OnMouseUp">
 
-                                <Line x:Name="Timeline" X1="0" Y1="15" Y2="15" StrokeThickness="5"
-                                      X2="{Binding Width, ElementName=CanvasFunctions}" Fill="Black" />
+                                <Line x:Name="Timeline" X1="0" Y1="15" Y2="15"
+                                      X2="{Binding ActualWidth, ElementName=CanvasFunctionsPanel}" StrokeThickness="3"
+                                      Stroke="Black" />
 
-                                <ItemsControl x:Name="CanvasFunctions"
+                                <ItemsControl x:Name="TimelineMarks" Canvas.Top="0" Canvas.Left="0"
+                                              ItemsSource="{Binding TimelineMarks, UpdateSourceTrigger=PropertyChanged}"
+                                              HorizontalAlignment="Left" VerticalAlignment="Top">
+                                    <ItemsControl.LayoutTransform>
+                                        <ScaleTransform ScaleX="{Binding ScaleX, ElementName=FuncScaleTransform}"
+                                                        ScaleY="{Binding ScaleY, ElementName=FuncScaleTransform}" />
+                                    </ItemsControl.LayoutTransform>
+                                </ItemsControl>
+
+                                <ItemsControl x:Name="CanvasFunctions" Canvas.Top="30"
                                               ItemsSource="{Binding FunctionsToRender, UpdateSourceTrigger=PropertyChanged}"
                                               HorizontalContentAlignment="Left" VerticalAlignment="Top"
                                               Focusable="True"
@@ -88,17 +98,12 @@
                                     <ItemsControl.LayoutTransform>
                                         <ScaleTransform x:Name="FuncScaleTransform" />
                                     </ItemsControl.LayoutTransform>
-                                    
                                 </ItemsControl>
 
-                                <ItemsControl x:Name="CanvasFunctionNames"
+                                <ItemsControl x:Name="CanvasFunctionNames" Canvas.Top="30"
                                               ItemsSource="{Binding FunctionNamesToRender, UpdateSourceTrigger=PropertyChanged}"
                                               HorizontalAlignment="Left" VerticalAlignment="Top">
-                                    <ItemsControl.LayoutTransform>
-                                        <TranslateTransform x:Name="FuncNamesTranslateTransform" />
-                                    </ItemsControl.LayoutTransform>
                                 </ItemsControl>
-                                
                             </Canvas>
                         </LayoutDocument>
                     </LayoutDocumentPane>
