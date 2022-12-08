@@ -15,7 +15,7 @@ public class JsonParser
 		{
 			string json = reader.ReadToEnd();
 			var threads = JObject.Parse(json);
-			var threadsValues = threads.Properties().Values();
+			var threadsValues = threads.Properties().Values().Values<string>();
 			resultStrings.AddRange(threadsValues.Select(value => value.ToString()));
 		}
 
