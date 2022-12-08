@@ -10,7 +10,7 @@ namespace UraniumStudio.Data;
 
 public static class FileParser
 {
-	public static IEnumerable<Function> ParseFile(string path)
+	public static List<Function> ParseFile(string path)
 	{
 		byte[] data = File.ReadAllBytes(path);
 		int cursor = 0;
@@ -63,7 +63,7 @@ public static class FileParser
 		}
 	}
 
-	static IEnumerable<Function> ConvertToRenderFunctions(
+	static List<Function> ConvertToRenderFunctions(
 		List<Tuple<Event, Event>> eventsTuples,
 		IReadOnlyList<string> funcNames,
 		double nsInTick)
