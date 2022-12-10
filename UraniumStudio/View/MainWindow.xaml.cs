@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using UraniumStudio.Data;
@@ -23,6 +23,79 @@ public partial class MainWindow
 	{
 		InitializeComponent();
 		//ScaleTransform.ScaleX = 0.0000001;
+
+		int index = 0;
+		var threadPaths = Database.ThreadPaths;
+		for (int i = 0; i < threadPaths.Count; i++)
+		{
+			Database.Functions.Add(new List<Function>());
+			Database.Functions[i].AddRange(FileParser.ParseFile(threadPaths[i]));
+		}
+
+		for (int i = 0; i < threadPaths.Count; i++)
+		{
+			string thread = threadPaths[i];
+			var canvas = new Canvas { };
+			var canvasFunc = new Canvas();
+			/* Binding scaleTransform to GlobalScaleTransform
+			canvasFunc.LayoutTransform = new ScaleTransform();
+			var canvasFuncBindingScaleX = new Binding("ScaleX")
+			{
+				Source = GlobalScaleTransform.ScaleX, Mode = BindingMode.OneWay,
+				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+			};
+			canvasFunc.SetBinding(ScaleTransform.ScaleXProperty, canvasFuncBindingScaleX);
+			*/
+			var canvasFuncNames = new Canvas();
+
+			var funcs = Renderer.GetCanvasesArray(Database.Functions[i]).Item1;
+			var funcNames = Renderer.GetCanvasesArray(Database.Functions[i]).Item2;
+			double maxThreadHeight = Renderer.GetMaxHeightOfThread(funcs);
+			foreach (var function in funcs)
+			{
+				canvasFunc.Children.Add(function);
+				Canvas.SetTop(canvasFunc, maxThreadHeight * i);
+			}
+
+			foreach (var function in funcNames)
+			{
+				canvasFuncNames.Children.Add(function);
+				Canvas.SetTop(canvasFuncNames, maxThreadHeight * i);
+			}
+
+			canvas.Children.Add(canvasFunc);
+			canvas.Children.Add(canvasFuncNames);
+
+			var threadRowDefinition = new RowDefinition
+				{ Height = new GridLength(maxThreadHeight), MinHeight = maxThreadHeight };
+			var splitterRowDefinition = new RowDefinition { Height = GridLength.Auto, MinHeight = 8 };
+			var gridSplitter = new GridSplitter
+			{
+				Height = 3, Background = Brushes.White, Width = this.Width, //
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				ShowsPreview = false, ResizeDirection = GridResizeDirection.Rows
+			};
+			Canvas.SetTop(gridSplitter, maxThreadHeight * i);
+			ThreadsFunctions.RowDefinitions.Add(threadRowDefinition);
+			ThreadsFunctions.RowDefinitions.Add(splitterRowDefinition);
+
+			Grid.SetRow(canvas, index);
+			index++;
+			//if splitters created
+			//Grid.SetRow(gridSplitter, index);
+			//index++;
+			Grid.SetColumnSpan(gridSplitter, 1);
+
+			//if splitters created
+			//canvas.SetValue(Grid.RowProperty, i);
+			//gridSplitter.SetValue(Grid.RowProperty, i + 1);
+
+			ThreadsFunctions.Children.Add(canvas);
+			//ThreadsFunctions.Children.Add(gridSplitter);
+		}
+
+		// if splitters created
+		// ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
@@ -34,25 +107,7 @@ public partial class MainWindow
 		{
 			Filter = "Файлы UPT |*.UPT"
 		};
-
 		dialog.ShowDialog();
-		if (dialog.FileName == "") return;
-		if (Database.Functions.Count > 0)
-			Database.Functions.Clear();
-		if (Database.Marks.Count > 0)
-			Database.Marks.Clear();
-
-		//Database.Functions.AddRange(FileParser.ParseFile(dialog.FileName));
-		//Database.Marks = TimelineCreator.GetTimelineMarks(
-		//		Database.Functions.Last().StartPosX + Database.Functions.Last().Length, GlobalScaleTransform.ScaleX).ToList();
-
-		//TODO сделать точку входа
-
-		//var mainPanel = new LayoutDocumentPane {Children = {new LayoutDocument{Content = new Canvas().Children.Add()} }};
-		//MainPanel = mainPanel;
-
-		DataContext = new MainWindowVM();
-		InfoStackPanel.Children.Clear();
 	}
 
 	void CanvasItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -90,36 +145,42 @@ public partial class MainWindow
 		if (GlobalScaleTransform.ScaleX is > minScale and < maxScale)
 		{
 			GlobalScaleTransform.ScaleX += direction * absDelta;
-			for (int i = 0; i < CanvasFunctionNames.Items.Count; i++)
+		}
+		/* Normal Scaling Function Names
+		 for (int i = 0; i < ItemsControl.Items.Count; i++)
+		{
+			for (var j = 0; j < (ItemsControl.Items[i] as Canvas)!.Children.Count; j++)
 			{
-				var name = (CanvasFunctionNames.Items[i] as Canvas)!.Children[0] as FrameworkElement;
-				var func = (CanvasFunctions.Items[i] as Canvas)!.Children[0] as FrameworkElement;
+				var name = (ItemsControl.Items[i] as Canvas)!.Children[0] as FrameworkElement;
+				var func = (ItemsControl.Items[i] as Canvas)!.Children[0] as FrameworkElement;
 				name!.MaxWidth = func!.ActualWidth * GlobalScaleTransform.ScaleX;
 
 				Canvas.SetLeft(name, Canvas.GetLeft(func) * GlobalScaleTransform.ScaleX);
-
-				/*if (i < TimelineMarks.Items.Count)
-				{
-					var mark = (TimelineMarks.Items[i] as Canvas)!.Children[0] as Line;
-					Canvas.SetLeft(mark,  10 * FuncScaleTransform.ScaleX);
-				}*/
 			}
 
-			/* Test changing marks while scaling
-				if (FuncScaleTransform.ScaleX > 2)
-				{
-					Database.Marks = new List<Canvas>();
-					TimelineMarks.ItemsSource = Database.Marks;
-				}*/
-			/*for (int i = 0; i < TimelineMarks.Items.Count; i++)
+
+			if (i < TimelineMarks.Items.Count)
 			{
 				var mark = (TimelineMarks.Items[i] as Canvas)!.Children[0] as Line;
-				//mark.X1=mark.X2*=FuncScaleTransform
-				Canvas.SetLeft(mark, mark.X1 * FuncScaleTransform.ScaleX);
-				//mark.RenderSize.Width
-				
+				Canvas.SetLeft(mark, 10 * GlobalScaleTransform.ScaleX);
+			}
+		}*/
+
+		/* Test changing marks while scaling
+			if (FuncScaleTransform.ScaleX > 2)
+			{
+				Database.Marks = new List<Canvas>();
+				TimelineMarks.ItemsSource = Database.Marks;
 			}*/
-		}
+		/*for (int i = 0; i < TimelineMarks.Items.Count; i++)
+		{
+			var mark = (TimelineMarks.Items[i] as Canvas)!.Children[0] as Line;
+			//mark.X1=mark.X2*=FuncScaleTransform
+			Canvas.SetLeft(mark, mark.X1 * FuncScaleTransform.ScaleX);
+			//mark.RenderSize.Width
+			
+		}*/
+		//}
 
 		if (GlobalScaleTransform.ScaleX <= minScale) GlobalScaleTransform.ScaleX += absDelta;
 		if (GlobalScaleTransform.ScaleX >= maxScale) GlobalScaleTransform.ScaleX -= absDelta;
@@ -137,9 +198,9 @@ public partial class MainWindow
 	void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
 	{
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
-		var pCanvas = e.GetPosition(TimelineMarks); // canvasFunctionsPanel
+		var pCanvas = e.GetPosition(Timeline); // canvasFunctionsPanel
 
-		double xOffset = (pCanvas.X - _targetPoint.X) * GlobalScaleTransform.ScaleX;
+		double xOffset = pCanvas.X - _targetPoint.X * GlobalScaleTransform.ScaleX;
 
 		//if (yOffset <= Canvas.GetTop(CanvasFunctionsPanel)) // Top Border  
 		//	yOffset = Canvas.GetTop(CanvasFunctionsPanel);					 
@@ -149,7 +210,7 @@ public partial class MainWindow
 		Canvas.SetLeft(ThreadsFunctions, xOffset); // CanvasFunctions
 		//Canvas.SetLeft(CanvasFunctions, xOffset);
 		//Canvas.SetLeft(CanvasFunctionNames, xOffset);
-		//Canvas.SetLeft(TimelineMarks, xOffset);
+		Canvas.SetLeft(TimelineMarks, xOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)

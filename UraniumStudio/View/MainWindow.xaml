@@ -75,13 +75,14 @@
                             <Canvas x:Name="CanvasFunctionsPanel" Background="Bisque" Top="0" Left="0"
                                     MouseDown="CanvasFunctionsPanel_OnMouseDown"
                                     MouseMove="CanvasFunctionsPanel_OnMouseMove"
-                                    MouseUp="CanvasFunctionsPanel_OnMouseUp">
+                                    MouseUp="CanvasFunctionsPanel_OnMouseUp"
+                                    PreviewMouseLeftButtonDown="CanvasItem_OnPreviewMouseLeftButtonDown">
 
                                 <Line x:Name="Timeline" X1="0" Y1="15" Y2="15"
                                       X2="{Binding ActualWidth, ElementName=CanvasFunctionsPanel}"
                                       StrokeThickness="3"
                                       Stroke="Black" />
-
+                                <Line x:Name="CursorLine" StrokeThickness="0.5" Stroke="White" />
                                 <ItemsControl x:Name="TimelineMarks" Canvas.Top="0" Canvas.Left="0"
                                               ItemsSource="{Binding TimelineMarks,
                                                UpdateSourceTrigger=PropertyChanged}"
@@ -91,12 +92,7 @@
                                     </ItemsControl.LayoutTransform>
                                 </ItemsControl>
 
-                                <Grid x:Name="ThreadsFunctions">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" MinHeight="100" />
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="Auto" MinHeight="100" />
-                                    </Grid.RowDefinitions>
+                                <Grid x:Name="ThreadsFunctions" Canvas.Top="30">
 
                                     <Grid.LayoutTransform>
                                         <ScaleTransform
@@ -105,8 +101,9 @@
                                             ScaleY="{Binding ScaleY,
                                                         ElementName=GlobalScaleTransform}" />
                                     </Grid.LayoutTransform>
-                                    <ItemsControl x:Name="ItemsControl" ItemsSource="{Binding SourceItemControls}"/> 
-                                    <!-- -->
+
+                                    <!-- <ItemsControl x:Name="ItemsControl" ItemsSource="{Binding SourceItemControls}"/> 
+                                    
                                     <Canvas Grid.Row="0" MinHeight="100" HorizontalAlignment="Stretch">
                                         <ItemsControl x:Name="CanvasFunctions"
                                                       Canvas.Top="30"
@@ -133,7 +130,7 @@
                                                   HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 
                                     <Canvas Grid.Row="2" Width="{Binding Width, ElementName=Window}"
-                                            HorizontalAlignment="Stretch" Background="CadetBlue">
+                                            HorizontalAlignment="Stretch" >
                                         <Canvas.LayoutTransform>
                                             <ScaleTransform
                                                 ScaleX="{Binding ScaleX,
@@ -142,7 +139,7 @@
                                                             ElementName=GlobalScaleTransform}" />
                                         </Canvas.LayoutTransform>
                                         <Rectangle Width="100" Height="40" Fill="Chartreuse" />
-                                    </Canvas>
+                                    </Canvas>-->
                                 </Grid>
 
                             </Canvas>

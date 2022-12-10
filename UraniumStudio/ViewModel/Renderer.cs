@@ -22,7 +22,8 @@ public static class Renderer
 
 			var funcName = new TextBlock
 			{
-				Text = functions[i].Name, MaxWidth = rectangles[i].Width
+				Text = functions[i].Name, MaxWidth = rectangles[i].Width,
+				Name = "funcName"
 			};
 
 			Canvas.SetLeft(rectangles[i], functions[i].StartPosX);
@@ -57,5 +58,18 @@ public static class Renderer
 		}
 
 		return rectangles;
+	}
+
+	public static double GetMaxHeightOfThread(IEnumerable<Canvas> functions)
+	{
+		double max = 0;
+		foreach (var f in functions)
+		{
+			double height = Canvas.GetTop(f.Children[0]);
+			if (height > max)
+				max = height;
+		}
+
+		return max + Function.Height;
 	}
 }

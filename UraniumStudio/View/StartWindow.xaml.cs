@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.ComponentModel;
+using System.Windows.Input;
 using UraniumStudio.Data;
 
 namespace UraniumStudio.View;
@@ -21,7 +22,10 @@ public partial class StartWindow
 
 		Database.ThreadPaths = JsonParser.ParseUpsJson(dialog.FileName); // json UPS parser
 		var mainWindow = new MainWindow();
+		mainWindow.Closing += MainWindowOnClosing;
 		mainWindow.Show();
 		Hide();
 	}
+
+	void MainWindowOnClosing(object? sender, CancelEventArgs e) => Close();
 }

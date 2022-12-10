@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -7,9 +7,10 @@ namespace UraniumStudio.ViewModel;
 
 public static class TimelineCreator
 {
-	public static IEnumerable<Canvas> GetTimelineMarks(double width, double scaleX)
+	public static Canvas[] GetTimelineMarks(double width, double scaleX)
 	{
-		int countMarks = (int)width / 10 + 1;
+		if (width is double.NaN) throw new ArgumentOutOfRangeException();
+		uint countMarks = (uint)width / 10 + 1;
 		var marks = new Canvas[countMarks];
 		const int step = 10;
 
