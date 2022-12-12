@@ -10,7 +10,7 @@ public static class TimelineCreator
 	public static Canvas[] GetTimelineMarks(double width, double scaleX)
 	{
 		if (width is double.NaN) throw new ArgumentOutOfRangeException();
-		uint countMarks = (uint)width / 10 + 1;
+		uint countMarks = (uint)width / 10 + 2;
 		var marks = new Canvas[countMarks];
 		const int step = 10;
 

@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
+using RulerControl.Wpf.PositionManagers;
 using UraniumStudio.Data;
 using UraniumStudio.Model;
 using UraniumStudio.ViewModel;
@@ -25,6 +26,7 @@ public partial class MainWindow
 		//ScaleTransform.ScaleX = 0.0000001;
 
 		int index = 0;
+		double maxThreadHeight = 0;
 		var threadPaths = Database.ThreadPaths;
 		for (int i = 0; i < threadPaths.Count; i++)
 		{
@@ -35,7 +37,7 @@ public partial class MainWindow
 		for (int i = 0; i < threadPaths.Count; i++)
 		{
 			string thread = threadPaths[i];
-			var canvas = new Canvas { };
+			var canvas = new Canvas { VerticalAlignment = VerticalAlignment.Top };
 			var canvasFunc = new Canvas();
 			/* Binding scaleTransform to GlobalScaleTransform
 			canvasFunc.LayoutTransform = new ScaleTransform();
@@ -50,7 +52,7 @@ public partial class MainWindow
 
 			var funcs = Renderer.GetCanvasesArray(Database.Functions[i]).Item1;
 			var funcNames = Renderer.GetCanvasesArray(Database.Functions[i]).Item2;
-			double maxThreadHeight = Renderer.GetMaxHeightOfThread(funcs);
+			maxThreadHeight += Renderer.GetMaxHeightOfThread(funcs);
 			foreach (var function in funcs)
 			{
 				canvasFunc.Children.Add(function);
@@ -65,37 +67,39 @@ public partial class MainWindow
 
 			canvas.Children.Add(canvasFunc);
 			canvas.Children.Add(canvasFuncNames);
-
+			double funcHeight = Renderer.GetMaxHeightOfThread(funcs);
 			var threadRowDefinition = new RowDefinition
-				{ Height = new GridLength(maxThreadHeight), MinHeight = maxThreadHeight };
+				{ Height = new GridLength(funcHeight), MinHeight = funcHeight };
 			var splitterRowDefinition = new RowDefinition { Height = GridLength.Auto, MinHeight = 8 };
 			var gridSplitter = new GridSplitter
 			{
 				Height = 3, Background = Brushes.White, Width = this.Width, //
 				HorizontalAlignment = HorizontalAlignment.Stretch,
-				ShowsPreview = false, ResizeDirection = GridResizeDirection.Rows
+				ShowsPreview = false, ResizeDirection = GridResizeDirection.Rows,
+				VerticalAlignment = VerticalAlignment.Center
 			};
 			Canvas.SetTop(gridSplitter, maxThreadHeight * i);
 			ThreadsFunctions.RowDefinitions.Add(threadRowDefinition);
 			ThreadsFunctions.RowDefinitions.Add(splitterRowDefinition);
 
-			Grid.SetRow(canvas, index);
+			canvas.SetValue(Grid.RowProperty, index);
 			index++;
 			//if splitters created
-			//Grid.SetRow(gridSplitter, index);
-			//index++;
-			Grid.SetColumnSpan(gridSplitter, 1);
-
-			//if splitters created
-			//canvas.SetValue(Grid.RowProperty, i);
-			//gridSplitter.SetValue(Grid.RowProperty, i + 1);
+			gridSplitter.SetValue(Grid.RowProperty, index);
+			index++;
+			//
+			Grid.SetRowSpan(gridSplitter, 1);
 
 			ThreadsFunctions.Children.Add(canvas);
-			//ThreadsFunctions.Children.Add(gridSplitter);
+			ThreadsFunctions.Children.Add(gridSplitter);
 		}
 
 		// if splitters created
-		// ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
+		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
+		double maxFunctionWidth = Renderer.GetMaxFunctionWidth(Database.Functions);
+		//var mainWindowVm = new MainWindowVM { TimelineMarks = TimelineCreator.GetTimelineMarks(maxFunctionWidth, 1) };
+		//DataContext = mainWindowVm;
+		
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
@@ -146,6 +150,8 @@ public partial class MainWindow
 		{
 			GlobalScaleTransform.ScaleX += direction * absDelta;
 		}
+		Ruler.MaxValue = 1200 / GlobalScaleTransform.ScaleX;
+		
 		/* Normal Scaling Function Names
 		 for (int i = 0; i < ItemsControl.Items.Count; i++)
 		{

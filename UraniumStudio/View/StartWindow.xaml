@@ -5,7 +5,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:UraniumStudio.View"
         mc:Ignorable="d"
-        Title="StartWindow" Height="450" Width="800" x:Name="Window" Background="DimGray">
+        Title="Uranium Studio" Height="450" Width="800" x:Name="Window" Background="DimGray"
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Image x:Key="MyImage" Source="UraniumStudio/Resources/Images/" />

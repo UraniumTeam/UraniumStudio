@@ -19,4 +19,8 @@
       <Folder Include="Resources\Images" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\RulerControl.Wpf\RulerControl.Wpf.csproj" />
+    </ItemGroup>
+
 </Project>

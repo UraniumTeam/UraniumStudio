@@ -72,4 +72,20 @@ public static class Renderer
 
 		return max + Function.Height;
 	}
+
+	public static double GetMaxFunctionWidth(List<List<Function>> threads)
+	{
+		double max = 0;
+		foreach (var thread in threads)
+		{
+			foreach (var f in thread)
+			{
+				double width = f.StartPosX + f.Length;
+				if (width > max)
+					max = width;
+			}
+		}
+
+		return max;
+	}
 }
