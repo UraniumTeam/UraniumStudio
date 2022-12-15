@@ -7,19 +7,19 @@ namespace UraniumStudio.ViewModel;
 
 public class MainWindowVM
 {
-	public IEnumerable<int> MajorStep { get; } = new [] { 1, 2, 5 };
-	public Func<double, double> ValueStepTransform { get; }
-	
-	private string unit;
-	
-	public event PropertyChangedEventHandler PropertyChanged;
+	public IEnumerable<int> MajorStep { get; } = new[] { 1, 2, 5 };
+	public Func<double, double> ValueStepTransform { get; } = null!;
+
+	string _unit = null!;
+
+	public event PropertyChangedEventHandler PropertyChanged = null!;
 
 	public MainWindowVM()
 	{
 
 	}
-	
-	private double UpdateStepValues(double stepValue)
+
+	double UpdateStepValues(double stepValue)
 	{
 		if (stepValue < 1)
 		{
@@ -31,15 +31,15 @@ public class MainWindowVM
 
 		return stepValue;
 	}
-	
+
 	public string Unit
 	{
-		get => unit;
+		get => _unit;
 		set
 		{
-			if (unit == value) return;
+			if (_unit == value) return;
 
-			unit = value;
+			_unit = value;
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Unit)));
 		}
 	}

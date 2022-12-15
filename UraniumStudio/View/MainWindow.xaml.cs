@@ -16,6 +16,7 @@ namespace UraniumStudio.View;
 
 public partial class MainWindow
 {
+	readonly double _maxThreadsWidth;
 	Point _targetPoint;
 	FrameworkElement? _targetElement;
 	UIElement? _selectedElement;
@@ -95,7 +96,7 @@ public partial class MainWindow
 
 		// if splitters created
 		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
-		double maxFunctionWidth = Renderer.GetMaxFunctionWidth(Database.Functions);
+		_maxThreadsWidth = Renderer.GetMaxElementsWidth(Database.Functions);
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
@@ -116,7 +117,7 @@ public partial class MainWindow
 		_selectedElement = e.OriginalSource as FrameworkElement;
 		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
-		
+
 		InfoStackPanel.Children.Clear();
 		Stats.Show();
 		var element = e.OriginalSource as FrameworkElement;
@@ -130,7 +131,7 @@ public partial class MainWindow
 	{
 		const double minScale = 0;
 		const double maxScale = 100;
-		double scaleMultiplier = (double)1 / 5000 * GlobalScaleTransform.ScaleX; //= (double)1 / 50000;
+		double scaleMultiplier = (double)1 / 5000 * GlobalScaleTransform.ScaleX;
 
 		double absDelta = Math.Abs(e.Delta * scaleMultiplier);
 		sbyte direction = e.Delta switch
@@ -144,8 +145,9 @@ public partial class MainWindow
 		{
 			GlobalScaleTransform.ScaleX += direction * absDelta;
 		}
-		Ruler.MaxValue = 1200 / GlobalScaleTransform.ScaleX;
-		
+
+		Ruler.MaxValue = _maxThreadsWidth;
+		Ruler.Width = _maxThreadsWidth * GlobalScaleTransform.ScaleX;
 		/* Normal Scaling Function Names
 		 for (int i = 0; i < ItemsControl.Items.Count; i++)
 		{
@@ -185,7 +187,7 @@ public partial class MainWindow
 		if (GlobalScaleTransform.ScaleX <= minScale) GlobalScaleTransform.ScaleX += absDelta;
 		if (GlobalScaleTransform.ScaleX >= maxScale) GlobalScaleTransform.ScaleX -= absDelta;
 
-		//FuncScaleTransform.CenterX = e.GetPosition(CanvasItems).X; // CanvasItems
+		//CentringTransform.CenterX = e.GetPosition(ThreadsFunctions).X;
 	}
 
 	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -198,11 +200,11 @@ public partial class MainWindow
 	void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
 	{
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
-		var pCanvas = e.GetPosition(Ruler);
+		var pCanvas = e.GetPosition(CanvasFunctionsPanel);
 
 		double xOffset = pCanvas.X - _targetPoint.X * GlobalScaleTransform.ScaleX;
-		
 		Canvas.SetLeft(ThreadsFunctions, xOffset);
+		Canvas.SetLeft(Ruler, xOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)

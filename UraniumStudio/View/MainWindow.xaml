@@ -4,8 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:UraniumStudio.ViewModel"
-        xmlns:ruler="clr-namespace:RulerControl;assembly=RulerControl.Wpf"
-        xmlns:wpf="clr-namespace:RulerControl.Wpf;assembly=RulerControl.Wpf"
+        xmlns:ruler="clr-namespace:RulerControl.Wpf;assembly=RulerControl.Wpf"
         mc:Ignorable="d"
         Title="Uranium Studio" Height="800" Width="1200" MinHeight="400" MinWidth="600" x:Name="Window"
         WindowStartupLocation="CenterScreen"
@@ -13,11 +12,11 @@
     <Window.DataContext>
         <vm:MainWindowVM />
     </Window.DataContext>
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/RulerControl.Wpf;component/RulerStyle.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/RulerControl.Wpf;component/RulerStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -88,25 +87,26 @@
                                     MouseMove="CanvasFunctionsPanel_OnMouseMove"
                                     MouseUp="CanvasFunctionsPanel_OnMouseUp"
                                     PreviewMouseLeftButtonDown="CanvasItem_OnPreviewMouseLeftButtonDown">
-                                <wpf:Ruler x:Name="Ruler" 
-                                           HorizontalAlignment="Stretch"
-                                           MarkerControlReference="{Binding ElementName=mainView}"
-                                           MaxValue="400"
-                                           MajorStepValues="{Binding MajorStep}"
-                                           ValueStepTransform="{Binding ValueStepTransform}"
-                                           Canvas.Top="0" Canvas.Left="0" Width="{Binding ActualWidth, ElementName=CanvasFunctionsPanel}" Height="30">
-                                    <wpf:Ruler.Resources>
+                                <ruler:Ruler x:Name="Ruler"
+                                             HorizontalAlignment="Stretch"
+                                             MaxValue="{Binding ActualWidth, ElementName=Window, Mode=OneTime}"
+                                             MarkerControlReference="{Binding ElementName=mainView}"
+                                             MajorStepValues="{Binding MajorStep}"
+                                             ValueStepTransform="{Binding ValueStepTransform}"
+                                             Canvas.Top="0" Canvas.Left="0"
+                                             Width="{Binding ActualWidth, ElementName=Window, Mode=OneTime}"
+                                             Height="30">
+                                    <ruler:Ruler.Resources>
                                         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                            <Setter Property="Margin" Value="5 0"/>
+                                            <Setter Property="Margin" Value="5 0" />
                                         </Style>
-                                    </wpf:Ruler.Resources>
-                                </wpf:Ruler>
-                                
+                                    </ruler:Ruler.Resources>
+                                </ruler:Ruler>
 
                                 <Grid x:Name="ThreadsFunctions" Canvas.Top="30">
 
                                     <Grid.LayoutTransform>
-                                        <ScaleTransform x:Name="GlobalScaleTransform"/>
+                                        <ScaleTransform x:Name="GlobalScaleTransform" />
                                     </Grid.LayoutTransform>
 
                                     <!-- <ItemsControl x:Name="ItemsControl" ItemsSource="{Binding SourceItemControls}"/> 
@@ -148,12 +148,10 @@
                                         <Rectangle Width="100" Height="40" Fill="Chartreuse" />
                                     </Canvas>-->
                                 </Grid>
-
                             </Canvas>
                         </LayoutDocument>
                     </LayoutDocumentPane>
                 </LayoutPanel>
-
             </LayoutRoot>
         </DockingManager>
     </Grid>
