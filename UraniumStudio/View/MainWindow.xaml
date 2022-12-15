@@ -102,31 +102,11 @@
                                     </wpf:Ruler.Resources>
                                 </wpf:Ruler>
                                 
-                                
-                                <Line x:Name="Timeline" X1="0" Y1="15" Y2="15"
-                                      X2="{Binding ActualWidth, ElementName=CanvasFunctionsPanel}"
-                                      StrokeThickness="3"
-                                      Stroke="Black" />
-                                <Line x:Name="CursorLine" StrokeThickness="0.5" Stroke="White" />
-                                <ItemsControl x:Name="TimelineMarks" Canvas.Top="0" Canvas.Left="0"
-                                              ItemsSource="{Binding TimelineMarks,
-                                               UpdateSourceTrigger=PropertyChanged}"
-                                              HorizontalAlignment="Left" VerticalAlignment="Top">
-                                    <ItemsControl.LayoutTransform>
-                                        <ScaleTransform x:Name="GlobalScaleTransform" />
-                                    </ItemsControl.LayoutTransform>
-                                </ItemsControl>
-                                
-                                
 
                                 <Grid x:Name="ThreadsFunctions" Canvas.Top="30">
 
                                     <Grid.LayoutTransform>
-                                        <ScaleTransform
-                                            ScaleX="{Binding ScaleX,
-                                                        ElementName=GlobalScaleTransform}"
-                                            ScaleY="{Binding ScaleY,
-                                                        ElementName=GlobalScaleTransform}" />
+                                        <ScaleTransform x:Name="GlobalScaleTransform"/>
                                     </Grid.LayoutTransform>
 
                                     <!-- <ItemsControl x:Name="ItemsControl" ItemsSource="{Binding SourceItemControls}"/> 

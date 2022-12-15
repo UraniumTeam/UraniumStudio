@@ -23,7 +23,6 @@ public partial class MainWindow
 	public MainWindow()
 	{
 		InitializeComponent();
-		//ScaleTransform.ScaleX = 0.0000001;
 
 		int index = 0;
 		double maxThreadHeight = 0;
@@ -97,9 +96,6 @@ public partial class MainWindow
 		// if splitters created
 		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
 		double maxFunctionWidth = Renderer.GetMaxFunctionWidth(Database.Functions);
-		//var mainWindowVm = new MainWindowVM { TimelineMarks = TimelineCreator.GetTimelineMarks(maxFunctionWidth, 1) };
-		//DataContext = mainWindowVm;
-		
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
@@ -120,9 +116,7 @@ public partial class MainWindow
 		_selectedElement = e.OriginalSource as FrameworkElement;
 		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
-
-		//TODO сделать таблицу данных о функции
-
+		
 		InfoStackPanel.Children.Clear();
 		Stats.Show();
 		var element = e.OriginalSource as FrameworkElement;
@@ -196,7 +190,7 @@ public partial class MainWindow
 
 	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
 	{
-		_targetElement = ThreadsFunctions; // CanvasFunctions
+		_targetElement = ThreadsFunctions;
 		if (_targetElement != null)
 			_targetPoint = e.GetPosition(_targetElement);
 	}
@@ -204,19 +198,11 @@ public partial class MainWindow
 	void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
 	{
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
-		var pCanvas = e.GetPosition(Timeline); // canvasFunctionsPanel
+		var pCanvas = e.GetPosition(Ruler);
 
 		double xOffset = pCanvas.X - _targetPoint.X * GlobalScaleTransform.ScaleX;
-
-		//if (yOffset <= Canvas.GetTop(CanvasFunctionsPanel)) // Top Border  
-		//	yOffset = Canvas.GetTop(CanvasFunctionsPanel);					 
-		//if (xOffset <= Canvas.GetLeft(CanvasFunctionsPanel)) // Left border
-		//	xOffset = Canvas.GetLeft(CanvasFunctionsPanel);
-
-		Canvas.SetLeft(ThreadsFunctions, xOffset); // CanvasFunctions
-		//Canvas.SetLeft(CanvasFunctions, xOffset);
-		//Canvas.SetLeft(CanvasFunctionNames, xOffset);
-		Canvas.SetLeft(TimelineMarks, xOffset);
+		
+		Canvas.SetLeft(ThreadsFunctions, xOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)

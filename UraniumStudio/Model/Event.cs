@@ -9,7 +9,7 @@ public class Event
 		EventType = index >> 28 == 0x0 ? EventType.Begin : EventType.End;
 	}
 
-	public uint Index { get; init; }
+	public uint Index { get; }
 
 	public EventType EventType { get; }
 
