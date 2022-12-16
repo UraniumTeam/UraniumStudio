@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -96,7 +97,9 @@ public partial class MainWindow
 
 		// if splitters created
 		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
-		_maxThreadsWidth = Renderer.GetMaxElementsWidth(Database.Functions);
+		_maxThreadsWidth = Renderer.GetMaxThreadsWidth(Database.Functions);
+		
+		//Ruler.
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>

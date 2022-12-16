@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -73,19 +74,8 @@ public static class Renderer
 		return max + Function.Height;
 	}
 
-	public static double GetMaxElementsWidth(List<List<Function>> threads)
+	public static double GetMaxThreadsWidth(IEnumerable<List<Function>> threads)
 	{
-		double max = 0;
-		foreach (var thread in threads)
-		{
-			foreach (var f in thread)
-			{
-				double width = f.StartPosX + f.Length;
-				if (width > max)
-					max = width;
-			}
-		}
-
-		return max;
+		return threads.SelectMany(x => x).Max(y => y.StartPosX + y.Length);
 	}
 }

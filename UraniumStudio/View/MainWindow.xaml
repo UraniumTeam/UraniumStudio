@@ -10,7 +10,7 @@
         WindowStartupLocation="CenterScreen"
         MouseWheel="MainWindow_OnMouseWheel">
     <Window.DataContext>
-        <vm:MainWindowVM />
+        <vm:MainWindowViewModel />
     </Window.DataContext>
 
     <Window.Resources>

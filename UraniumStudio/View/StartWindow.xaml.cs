@@ -20,7 +20,7 @@ public partial class StartWindow
 		dialog.ShowDialog();
 		if (dialog.FileName == "") return;
 
-		Database.ThreadPaths = JsonParser.ParseUpsJson(dialog.FileName); // json UPS parser
+		Database.ThreadPaths = JsonParser.ParseUpsJson(dialog.FileName);
 		var mainWindow = new MainWindow();
 		mainWindow.Closing += MainWindowOnClosing;
 		mainWindow.Show();
