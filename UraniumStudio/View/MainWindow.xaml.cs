@@ -96,8 +96,6 @@ public partial class MainWindow
 		// if splitters created
 		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
 		_maxThreadsWidth = Renderer.GetMaxThreadsWidth(Database.Functions);
-
-		//Ruler.
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
@@ -151,21 +149,19 @@ public partial class MainWindow
 		Ruler.Width = _maxThreadsWidth * _globalScaleTransform.ScaleX;
 		for (int i = 0; i < ThreadsFunctions.Children.Count; i++)
 		{
-			if (ThreadsFunctions.Children[i] is Canvas)
+			if (ThreadsFunctions.Children[i] is not Canvas) continue;
+			var currentThreadCanvas = ThreadsFunctions.Children[i] as Canvas;
+			for (int j = 0; j < (currentThreadCanvas!.Children[1] as Canvas)!.Children.Count; j++)
 			{
-				var currentThreadCanvas = ThreadsFunctions.Children[i] as Canvas;
-				for (var j = 0; j < (currentThreadCanvas!.Children[1] as Canvas)!.Children.Count; j++)
-				{
-					var name
-						= ((currentThreadCanvas.Children[1] as Canvas)!.Children[j] as Canvas)!.Children[0] as
-						FrameworkElement;
-					var func
-						= ((currentThreadCanvas.Children[0] as Canvas)!.Children[j] as Canvas)!.Children[0] as
-						FrameworkElement;
+				var name
+					= ((currentThreadCanvas.Children[1] as Canvas)!.Children[j] as Canvas)!.Children[0] as
+					FrameworkElement;
+				var func
+					= ((currentThreadCanvas.Children[0] as Canvas)!.Children[j] as Canvas)!.Children[0] as
+					FrameworkElement;
 
-					name!.MaxWidth = func!.ActualWidth * _globalScaleTransform.ScaleX;
-					Canvas.SetLeft(name, Canvas.GetLeft(func) * _globalScaleTransform.ScaleX);
-				}
+				name!.MaxWidth = func!.ActualWidth * _globalScaleTransform.ScaleX;
+				Canvas.SetLeft(name, Canvas.GetLeft(func) * _globalScaleTransform.ScaleX);
 			}
 		}
 

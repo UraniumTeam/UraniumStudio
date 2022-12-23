@@ -105,45 +105,8 @@
 
                                 <Grid x:Name="ThreadsFunctions" Canvas.Top="30">
 
-                                    <!-- <ItemsControl x:Name="ItemsControl" ItemsSource="{Binding SourceItemControls}"/> 
-                                    
-                                    <Canvas Grid.Row="0" MinHeight="100" HorizontalAlignment="Stretch">
-                                        <ItemsControl x:Name="CanvasFunctions"
-                                                      Canvas.Top="30"
-                                                      ItemsSource="{Binding FunctionsToRender, UpdateSourceTrigger=PropertyChanged}"
-                                                      HorizontalContentAlignment="Left" VerticalAlignment="Top"
-                                                      Focusable="True"
-                                                      PreviewMouseLeftButtonDown="CanvasItem_OnPreviewMouseLeftButtonDown">
-                                            <ItemsControl.LayoutTransform>
-                                                <ScaleTransform
-                                                    ScaleX="{Binding ScaleX,
-                                                            ElementName=GlobalScaleTransform}"
-                                                    ScaleY="{Binding ScaleY,
-                                                            ElementName=GlobalScaleTransform}" />
-                                            </ItemsControl.LayoutTransform>
-                                        </ItemsControl>
-
-                                        <ItemsControl x:Name="CanvasFunctionNames" Canvas.Top="30"
-                                                      ItemsSource="{Binding FunctionNamesToRender, UpdateSourceTrigger=PropertyChanged}"
-                                                      HorizontalAlignment="Left" VerticalAlignment="Top">
-                                        </ItemsControl>
-                                    </Canvas>
-
-                                    <GridSplitter Grid.Row="1" Height="5" Background="Black"
-                                                  HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-
-                                    <Canvas Grid.Row="2" Width="{Binding Width, ElementName=Window}"
-                                            HorizontalAlignment="Stretch" >
-                                        <Canvas.LayoutTransform>
-                                            <ScaleTransform
-                                                ScaleX="{Binding ScaleX,
-                                                            ElementName=GlobalScaleTransform}"
-                                                ScaleY="{Binding ScaleY,
-                                                            ElementName=GlobalScaleTransform}" />
-                                        </Canvas.LayoutTransform>
-                                        <Rectangle Width="100" Height="40" Fill="Chartreuse" />
-                                    </Canvas>-->
                                 </Grid>
+
                             </Canvas>
                         </LayoutDocument>
                     </LayoutDocumentPane>
