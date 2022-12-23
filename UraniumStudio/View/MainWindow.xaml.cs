@@ -77,6 +77,8 @@ public partial class MainWindow
 				ShowsPreview = false, ResizeDirection = GridResizeDirection.Rows,
 				VerticalAlignment = VerticalAlignment.Center
 			};
+			BindingOperations.SetBinding(
+				gridSplitter, WidthProperty, new Binding("Width") { Source = Ruler });
 			Canvas.SetTop(gridSplitter, maxThreadHeight * i);
 			ThreadsFunctions.RowDefinitions.Add(threadRowDefinition);
 			ThreadsFunctions.RowDefinitions.Add(splitterRowDefinition);
