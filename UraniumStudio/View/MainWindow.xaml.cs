@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
-using RulerControl.Wpf.PositionManagers;
 using UraniumStudio.Data;
 using UraniumStudio.Model;
 using UraniumStudio.ViewModel;
@@ -21,10 +20,13 @@ public partial class MainWindow
 	Point _targetPoint;
 	FrameworkElement? _targetElement;
 	UIElement? _selectedElement;
+	readonly ScaleTransform _globalScaleTransform;
 
 	public MainWindow()
 	{
 		InitializeComponent();
+		var viewModel = new MainWindowViewModel();
+		_globalScaleTransform = viewModel.GlobalScaleTransform;
 
 		int index = 0;
 		double maxThreadHeight = 0;
@@ -39,16 +41,12 @@ public partial class MainWindow
 		{
 			string thread = threadPaths[i];
 			var canvas = new Canvas { VerticalAlignment = VerticalAlignment.Top };
-			var canvasFunc = new Canvas();
-			/* Binding scaleTransform to GlobalScaleTransform
-			canvasFunc.LayoutTransform = new ScaleTransform();
-			var canvasFuncBindingScaleX = new Binding("ScaleX")
+			var canvasFunc = new Canvas
 			{
-				Source = GlobalScaleTransform.ScaleX, Mode = BindingMode.OneWay,
-				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+				RenderTransform = _globalScaleTransform
 			};
-			canvasFunc.SetBinding(ScaleTransform.ScaleXProperty, canvasFuncBindingScaleX);
-			*/
+			BindingOperations.SetBinding(
+				canvasFunc, ScaleTransform.ScaleXProperty, new Binding("Value") { Source = _globalScaleTransform });
 			var canvasFuncNames = new Canvas();
 
 			var funcs = Renderer.GetCanvasesArray(Database.Functions[i]).Item1;
@@ -98,7 +96,7 @@ public partial class MainWindow
 		// if splitters created
 		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
 		_maxThreadsWidth = Renderer.GetMaxThreadsWidth(Database.Functions);
-		
+
 		//Ruler.
 	}
 
@@ -134,7 +132,7 @@ public partial class MainWindow
 	{
 		const double minScale = 0;
 		const double maxScale = 100;
-		double scaleMultiplier = (double)1 / 5000 * GlobalScaleTransform.ScaleX;
+		double scaleMultiplier = (double)1 / 5000 * _globalScaleTransform.ScaleX;
 
 		double absDelta = Math.Abs(e.Delta * scaleMultiplier);
 		sbyte direction = e.Delta switch
@@ -144,51 +142,35 @@ public partial class MainWindow
 			_ => 0
 		};
 
-		if (GlobalScaleTransform.ScaleX is > minScale and < maxScale)
+		if (_globalScaleTransform.ScaleX is > minScale and < maxScale)
 		{
-			GlobalScaleTransform.ScaleX += direction * absDelta;
+			_globalScaleTransform.ScaleX += direction * absDelta;
 		}
 
 		Ruler.MaxValue = _maxThreadsWidth;
-		Ruler.Width = _maxThreadsWidth * GlobalScaleTransform.ScaleX;
-		/* Normal Scaling Function Names
-		 for (int i = 0; i < ItemsControl.Items.Count; i++)
+		Ruler.Width = _maxThreadsWidth * _globalScaleTransform.ScaleX;
+		for (int i = 0; i < ThreadsFunctions.Children.Count; i++)
 		{
-			for (var j = 0; j < (ItemsControl.Items[i] as Canvas)!.Children.Count; j++)
+			if (ThreadsFunctions.Children[i] is Canvas)
 			{
-				var name = (ItemsControl.Items[i] as Canvas)!.Children[0] as FrameworkElement;
-				var func = (ItemsControl.Items[i] as Canvas)!.Children[0] as FrameworkElement;
-				name!.MaxWidth = func!.ActualWidth * GlobalScaleTransform.ScaleX;
+				var currentThreadCanvas = ThreadsFunctions.Children[i] as Canvas;
+				for (var j = 0; j < (currentThreadCanvas!.Children[1] as Canvas)!.Children.Count; j++)
+				{
+					var name
+						= ((currentThreadCanvas.Children[1] as Canvas)!.Children[j] as Canvas)!.Children[0] as
+						FrameworkElement;
+					var func
+						= ((currentThreadCanvas.Children[0] as Canvas)!.Children[j] as Canvas)!.Children[0] as
+						FrameworkElement;
 
-				Canvas.SetLeft(name, Canvas.GetLeft(func) * GlobalScaleTransform.ScaleX);
+					name!.MaxWidth = func!.ActualWidth * _globalScaleTransform.ScaleX;
+					Canvas.SetLeft(name, Canvas.GetLeft(func) * _globalScaleTransform.ScaleX);
+				}
 			}
+		}
 
-
-			if (i < TimelineMarks.Items.Count)
-			{
-				var mark = (TimelineMarks.Items[i] as Canvas)!.Children[0] as Line;
-				Canvas.SetLeft(mark, 10 * GlobalScaleTransform.ScaleX);
-			}
-		}*/
-
-		/* Test changing marks while scaling
-			if (FuncScaleTransform.ScaleX > 2)
-			{
-				Database.Marks = new List<Canvas>();
-				TimelineMarks.ItemsSource = Database.Marks;
-			}*/
-		/*for (int i = 0; i < TimelineMarks.Items.Count; i++)
-		{
-			var mark = (TimelineMarks.Items[i] as Canvas)!.Children[0] as Line;
-			//mark.X1=mark.X2*=FuncScaleTransform
-			Canvas.SetLeft(mark, mark.X1 * FuncScaleTransform.ScaleX);
-			//mark.RenderSize.Width
-			
-		}*/
-		//}
-
-		if (GlobalScaleTransform.ScaleX <= minScale) GlobalScaleTransform.ScaleX += absDelta;
-		if (GlobalScaleTransform.ScaleX >= maxScale) GlobalScaleTransform.ScaleX -= absDelta;
+		if (_globalScaleTransform.ScaleX <= minScale) _globalScaleTransform.ScaleX += absDelta;
+		if (_globalScaleTransform.ScaleX >= maxScale) _globalScaleTransform.ScaleX -= absDelta;
 
 		//CentringTransform.CenterX = e.GetPosition(ThreadsFunctions).X;
 	}
@@ -205,7 +187,7 @@ public partial class MainWindow
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
 		var pCanvas = e.GetPosition(CanvasFunctionsPanel);
 
-		double xOffset = pCanvas.X - _targetPoint.X * GlobalScaleTransform.ScaleX;
+		double xOffset = pCanvas.X - _targetPoint.X;
 		Canvas.SetLeft(ThreadsFunctions, xOffset);
 		Canvas.SetLeft(Ruler, xOffset);
 	}

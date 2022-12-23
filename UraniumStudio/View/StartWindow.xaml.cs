@@ -27,5 +27,10 @@ public partial class StartWindow
 		Hide();
 	}
 
+	void CreateNew_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+	{
+		
+	}
+
 	void MainWindowOnClosing(object? sender, CancelEventArgs e) => Close();
 }

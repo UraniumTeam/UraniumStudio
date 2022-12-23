@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:UraniumStudio.View"
         mc:Ignorable="d"
         Title="Uranium Studio" Height="450" Width="800" x:Name="Window" Background="DimGray"
         WindowStartupLocation="CenterScreen">
@@ -11,10 +10,14 @@
     <Window.Resources>
         <Image x:Key="MyImage" Source="UraniumStudio/Resources/Images/" />
     </Window.Resources>
-    
+
     <StackPanel x:Name="Buttons" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
-        <Button x:Name="OpenExisting" Width="200" Height="120" Content="Open existing" Background="LightGoldenrodYellow" FontWeight="SemiBold" FontSize="12" BorderBrush="Black" BorderThickness="2"
+        <Button x:Name="OpenExisting" Width="200" Height="120" Content="Open existing"
+                Background="LightGoldenrodYellow" FontWeight="SemiBold" FontSize="12" BorderBrush="Black"
+                BorderThickness="2"
                 PreviewMouseDown="OpenExisting_OnMouseLeftButtonDown" />
-        <Button x:Name="CreateNew" Width="200" Height="120" Content="Create new" Background="LightGoldenrodYellow" FontWeight="SemiBold" FontSize="12" BorderBrush="Black" BorderThickness="2"/>
+        <Button x:Name="CreateNew" Width="200" Height="120" Content="Create new" Background="LightGoldenrodYellow"
+                FontWeight="SemiBold" FontSize="12" BorderBrush="Black" BorderThickness="2" 
+                PreviewMouseDown="CreateNew_OnMouseLeftButtonDown"/>
     </StackPanel>
 </Window>

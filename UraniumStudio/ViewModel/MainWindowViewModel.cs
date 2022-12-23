@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows.Media;
 
 namespace UraniumStudio.ViewModel;
 
@@ -8,6 +9,8 @@ public class MainWindowViewModel : BaseViewModel
 {
 	public IEnumerable<int> MajorStep { get; }
 	public Func<double, double> ValueStepTransform { get; }
+	
+	public ScaleTransform GlobalScaleTransform { get; }
 
 	string _unit = null!;
 
@@ -28,6 +31,7 @@ public class MainWindowViewModel : BaseViewModel
 	{
 		MajorStep = new[] { 1, 2, 5 };
 		ValueStepTransform = UpdateStepValues;
+		GlobalScaleTransform = new ScaleTransform();
 	}
 
 	double UpdateStepValues(double stepValue)
