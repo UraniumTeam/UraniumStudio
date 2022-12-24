@@ -53,8 +53,7 @@ public static class Renderer
 				Focusable = true,
 				Fill = new SolidColorBrush(functions[i].Color),
 				Width = functions[i].Length,
-				Height = Function.Height,
-				Name = functions[i].Name
+				Height = Function.Height
 			};
 		}
 
