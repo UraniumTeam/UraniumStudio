@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -22,7 +23,8 @@ public static class Renderer
 
 			var funcName = new TextBlock
 			{
-				Text = functions[i].Name, MaxWidth = rectangles[i].Width
+				Text = functions[i].Name, MaxWidth = rectangles[i].Width,
+				Name = "funcName"
 			};
 
 			Canvas.SetLeft(rectangles[i], functions[i].StartPosX);
@@ -51,11 +53,28 @@ public static class Renderer
 				Focusable = true,
 				Fill = new SolidColorBrush(functions[i].Color),
 				Width = functions[i].Length,
-				Height = Function.Height,
-				Name = functions[i].Name
+				Height = Function.Height
 			};
 		}
 
 		return rectangles;
+	}
+
+	public static double GetMaxHeightOfThread(IEnumerable<Canvas> functions)
+	{
+		double max = 0;
+		foreach (var f in functions)
+		{
+			double height = Canvas.GetTop(f.Children[0]);
+			if (height > max)
+				max = height;
+		}
+
+		return max + Function.Height;
+	}
+
+	public static double GetMaxThreadsWidth(IEnumerable<List<Function>> threads)
+	{
+		return threads.SelectMany(x => x).Max(y => y.StartPosX + y.Length);
 	}
 }

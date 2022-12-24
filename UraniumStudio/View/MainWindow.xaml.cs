@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using UraniumStudio.Data;
+using UraniumStudio.Model;
 using UraniumStudio.ViewModel;
 using Point = System.Windows.Point;
 
@@ -12,16 +16,88 @@ namespace UraniumStudio.View;
 
 public partial class MainWindow
 {
+	readonly double _maxThreadsWidth;
 	Point _targetPoint;
 	FrameworkElement? _targetElement;
 	UIElement? _selectedElement;
+	readonly ScaleTransform _globalScaleTransform;
 
 	public MainWindow()
 	{
 		InitializeComponent();
-		Canvas.SetLeft(CanvasFunctions, 0);
-		Canvas.SetTop(CanvasFunctions, 0);
-		//ScaleTransform.ScaleX = 0.0000001;
+		var viewModel = new MainWindowViewModel();
+		_globalScaleTransform = viewModel.GlobalScaleTransform;
+
+		int index = 0;
+		double maxThreadHeight = 0;
+		var threadPaths = Database.ThreadPaths;
+		for (int i = 0; i < threadPaths.Count; i++)
+		{
+			Database.Functions.Add(new List<Function>());
+			Database.Functions[i].AddRange(FileParser.ParseFile(threadPaths[i]));
+		}
+
+		for (int i = 0; i < threadPaths.Count; i++)
+		{
+			string thread = threadPaths[i];
+			var canvas = new Canvas { VerticalAlignment = VerticalAlignment.Top };
+			var canvasFunc = new Canvas
+			{
+				RenderTransform = _globalScaleTransform
+			};
+			BindingOperations.SetBinding(
+				canvasFunc, ScaleTransform.ScaleXProperty, new Binding("Value") { Source = _globalScaleTransform });
+			var canvasFuncNames = new Canvas();
+
+			var funcs = Renderer.GetCanvasesArray(Database.Functions[i]).Item1;
+			var funcNames = Renderer.GetCanvasesArray(Database.Functions[i]).Item2;
+			maxThreadHeight += Renderer.GetMaxHeightOfThread(funcs);
+			foreach (var function in funcs)
+			{
+				canvasFunc.Children.Add(function);
+				Canvas.SetTop(canvasFunc, maxThreadHeight * i);
+			}
+
+			foreach (var function in funcNames)
+			{
+				canvasFuncNames.Children.Add(function);
+				Canvas.SetTop(canvasFuncNames, maxThreadHeight * i);
+			}
+
+			canvas.Children.Add(canvasFunc);
+			canvas.Children.Add(canvasFuncNames);
+			double funcHeight = Renderer.GetMaxHeightOfThread(funcs);
+			var threadRowDefinition = new RowDefinition
+				{ Height = new GridLength(funcHeight), MinHeight = funcHeight };
+			var splitterRowDefinition = new RowDefinition { Height = GridLength.Auto, MinHeight = 8 };
+			var gridSplitter = new GridSplitter
+			{
+				Height = 3, Background = Brushes.White, Width = this.Width, //
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				ShowsPreview = false, ResizeDirection = GridResizeDirection.Rows,
+				VerticalAlignment = VerticalAlignment.Center
+			};
+			BindingOperations.SetBinding(
+				gridSplitter, WidthProperty, new Binding("Width") { Source = Ruler });
+			Canvas.SetTop(gridSplitter, maxThreadHeight * i);
+			ThreadsFunctions.RowDefinitions.Add(threadRowDefinition);
+			ThreadsFunctions.RowDefinitions.Add(splitterRowDefinition);
+
+			canvas.SetValue(Grid.RowProperty, index);
+			index++;
+			//if splitters created
+			gridSplitter.SetValue(Grid.RowProperty, index);
+			index++;
+			//
+			Grid.SetRowSpan(gridSplitter, 1);
+
+			ThreadsFunctions.Children.Add(canvas);
+			ThreadsFunctions.Children.Add(gridSplitter);
+		}
+
+		// if splitters created
+		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
+		_maxThreadsWidth = Renderer.GetMaxThreadsWidth(Database.Functions);
 	}
 
 	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
@@ -33,20 +109,7 @@ public partial class MainWindow
 		{
 			Filter = "Файлы UPT |*.UPT"
 		};
-
 		dialog.ShowDialog();
-		if (dialog.FileName == "") return;
-		if (Database.Functions.Count > 0)
-			Database.Functions.Clear();
-		Database.Functions.AddRange(FileParser.ParseFile(dialog.FileName));
-		
-		//TODO сделать точку входа
-		 
-		//var mainPanel = new LayoutDocumentPane {Children = {new LayoutDocument{Content = new Canvas().Children.Add()} }};
-		//MainPanel = mainPanel;
-		
-		DataContext = new MainWindowVM();
-		InfoStackPanel.Children.Clear();
 	}
 
 	void CanvasItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -55,9 +118,7 @@ public partial class MainWindow
 		_selectedElement = e.OriginalSource as FrameworkElement;
 		if (_selectedElement is not Rectangle) return;
 		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
-		
-		 //TODO сделать таблицу данных о функции
-		
+
 		InfoStackPanel.Children.Clear();
 		Stats.Show();
 		var element = e.OriginalSource as FrameworkElement;
@@ -71,7 +132,7 @@ public partial class MainWindow
 	{
 		const double minScale = 0;
 		const double maxScale = 100;
-		double scaleMultiplier = (double)1 / 5000 * FuncScaleTransform.ScaleX; //= (double)1 / 50000;
+		double scaleMultiplier = (double)1 / 5000 * _globalScaleTransform.ScaleX;
 
 		double absDelta = Math.Abs(e.Delta * scaleMultiplier);
 		sbyte direction = e.Delta switch
@@ -81,27 +142,40 @@ public partial class MainWindow
 			_ => 0
 		};
 
-		if (FuncScaleTransform.ScaleX is > minScale and < maxScale)
+		if (_globalScaleTransform.ScaleX is > minScale and < maxScale)
 		{
-			FuncScaleTransform.ScaleX += direction * absDelta;
-			for (int i = 0; i < CanvasFunctionNames.Items.Count; i++)
+			_globalScaleTransform.ScaleX += direction * absDelta;
+		}
+
+		Ruler.MaxValue = _maxThreadsWidth;
+		Ruler.Width = _maxThreadsWidth * _globalScaleTransform.ScaleX;
+		for (int i = 0; i < ThreadsFunctions.Children.Count; i++)
+		{
+			if (ThreadsFunctions.Children[i] is not Canvas) continue;
+			var currentThreadCanvas = ThreadsFunctions.Children[i] as Canvas;
+			for (int j = 0; j < (currentThreadCanvas!.Children[1] as Canvas)!.Children.Count; j++)
 			{
-				var name = (CanvasFunctionNames.Items[i] as Canvas)!.Children[0] as FrameworkElement;
-				var func = (CanvasFunctions.Items[i] as Canvas)!.Children[0] as FrameworkElement;
-				name!.MaxWidth = func!.ActualWidth * FuncScaleTransform.ScaleX;
-				Canvas.SetLeft(name, Canvas.GetLeft(func) * FuncScaleTransform.ScaleX);
+				var name
+					= ((currentThreadCanvas.Children[1] as Canvas)!.Children[j] as Canvas)!.Children[0] as
+					FrameworkElement;
+				var func
+					= ((currentThreadCanvas.Children[0] as Canvas)!.Children[j] as Canvas)!.Children[0] as
+					FrameworkElement;
+
+				name!.MaxWidth = func!.ActualWidth * _globalScaleTransform.ScaleX;
+				Canvas.SetLeft(name, Canvas.GetLeft(func) * _globalScaleTransform.ScaleX);
 			}
 		}
 
-		if (FuncScaleTransform.ScaleX <= minScale) FuncScaleTransform.ScaleX += absDelta;
-		if (FuncScaleTransform.ScaleX >= maxScale) FuncScaleTransform.ScaleX -= absDelta;
+		if (_globalScaleTransform.ScaleX <= minScale) _globalScaleTransform.ScaleX += absDelta;
+		if (_globalScaleTransform.ScaleX >= maxScale) _globalScaleTransform.ScaleX -= absDelta;
 
-		//FuncScaleTransform.CenterX = e.GetPosition(CanvasItems).X; // CanvasItems
+		//CentringTransform.CenterX = e.GetPosition(ThreadsFunctions).X;
 	}
 
 	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
 	{
-		_targetElement = CanvasFunctions; // CanvasItems
+		_targetElement = ThreadsFunctions;
 		if (_targetElement != null)
 			_targetPoint = e.GetPosition(_targetElement);
 	}
@@ -109,17 +183,11 @@ public partial class MainWindow
 	void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
 	{
 		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
-		var pCanvas = e.GetPosition(CanvasFunctionsPanel); // CanvasFunctionPanel
+		var pCanvas = e.GetPosition(CanvasFunctionsPanel);
 
-		double xOffset = pCanvas.X - _targetPoint.X * FuncScaleTransform.ScaleX; // * FuncScaleTransform.ScaleX
-
-		//if (yOffset <= Canvas.GetTop(CanvasFunctionsPanel)) // Top Border  
-		//	yOffset = Canvas.GetTop(CanvasFunctionsPanel);					 
-		//if (xOffset <= Canvas.GetLeft(CanvasFunctionsPanel)) // Left border
-		//	xOffset = Canvas.GetLeft(CanvasFunctionsPanel);
-
-		Canvas.SetLeft(CanvasFunctions, xOffset);
-		Canvas.SetLeft(CanvasFunctionNames, xOffset);
+		double xOffset = pCanvas.X - _targetPoint.X;
+		Canvas.SetLeft(ThreadsFunctions, xOffset);
+		Canvas.SetLeft(Ruler, xOffset);
 	}
 
 	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)

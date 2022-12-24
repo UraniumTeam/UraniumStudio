@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UraniumStudio", "UraniumStu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UraniumStudioTests", "UraniumStudioTests\UraniumStudioTests.csproj", "{CE2889D1-B58E-4414-A7BB-928D58CFC53E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RulerControl.Wpf", "Ruler.Wpf\src\RulerControl.Wpf\RulerControl.Wpf.csproj", "{3E6D5159-C0EA-4FC1-9831-1FC8241ABE5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{CE2889D1-B58E-4414-A7BB-928D58CFC53E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE2889D1-B58E-4414-A7BB-928D58CFC53E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE2889D1-B58E-4414-A7BB-928D58CFC53E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E6D5159-C0EA-4FC1-9831-1FC8241ABE5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E6D5159-C0EA-4FC1-9831-1FC8241ABE5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E6D5159-C0EA-4FC1-9831-1FC8241ABE5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E6D5159-C0EA-4FC1-9831-1FC8241ABE5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

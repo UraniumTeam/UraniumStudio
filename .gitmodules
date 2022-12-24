@@ -1,0 +1,3 @@
+[submodule "Ruler.Wpf"]
+	path = Ruler.Wpf
+	url = https://github.com/xclemence/Ruler.Wpf
