@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,90 +19,57 @@ public static class FileParser
         var funcNamesCount = reader.ReadUInt32();
 
         var funcNames = new string[funcNamesCount];
-        var eventsTuples = new List<Tuple<Event, Event>>();
 
         for (var i = 0; i < funcNamesCount; i++)
         {
-            var countLettersInFuncName = reader.ReadUInt16();
-            var dataSliceFuncName = reader.ReadBytes(countLettersInFuncName);
-            funcNames[i] = Encoding.ASCII.GetString(dataSliceFuncName);
+            var functionNameLength = reader.ReadUInt16();
+            var functionName = reader.ReadBytes(functionNameLength);
+            funcNames[i] = Encoding.ASCII.GetString(functionName);
         }
 
         var eventsCount = reader.ReadUInt32();
-        for (var i = 0; i < eventsCount / 2; i++)
+        var events = new Event[eventsCount];
+        for (var i = 0; i < eventsCount; i++)
         {
             var indexBegin = reader.ReadUInt32();
             var tickTimestampBegin = reader.ReadUInt64();
-            var eventBegin = new Event(indexBegin, tickTimestampBegin);
-
-            var indexEnd = reader.ReadUInt32();
-            var tickTimestampEnd = reader.ReadUInt64();
-            var eventEnd = new Event(indexEnd, tickTimestampEnd);
-            eventsTuples.Add(new Tuple<Event, Event>(eventBegin, eventEnd));
+            events[i] = new Event(indexBegin, tickTimestampBegin);
         }
 
-        ToStartOfTimeline(eventsTuples);
-        return ConvertToRenderFunctions(eventsTuples, funcNames, nsInTick);
+        var min = events.Min(x => x.TickTimestamp);
+        events = events
+            .Select(x => x with { TickTimestamp = x.TickTimestamp - min })
+            .OrderBy(x => x.TickTimestamp)
+            .ToArray();
+
+        return ConvertToRenderFunctions(events, funcNames, nsInTick);
     }
 
-    private static void ToStartOfTimeline(List<Tuple<Event, Event>> eventsTuples)
+    private static List<Function> ConvertToRenderFunctions(ReadOnlySpan<Event> events, IReadOnlyList<string> names,
+        double nsInTick)
     {
-        double minX = eventsTuples.Min(e => e.Item1.TickTimestamp);
-        foreach (var (eventBegin, eventEnd) in eventsTuples)
+        var result = new List<Function>();
+        var eventStack = new Stack<int>();
+        for (var i = 0; i < events.Length; i++)
         {
-            eventBegin.TickTimestamp -= (ulong)minX;
-            eventEnd.TickTimestamp -= (ulong)minX;
-        }
-    }
-
-    private static List<Function> ConvertToRenderFunctions(List<Tuple<Event, Event>> eventsTuples,
-        IReadOnlyList<string> funcNames, double nsInTick)
-    {
-        var functions = new List<Function>();
-        var rows = new Dictionary<uint, double>();
-        foreach (var (eventBegin, eventEnd) in eventsTuples)
-        {
-            var timeBeginMs = TimeConverter.TicksToMilliseconds(eventBegin.TickTimestamp, nsInTick);
-            var timeEndMs = TimeConverter.TicksToMilliseconds(eventEnd.TickTimestamp, nsInTick);
-            var funcLengthMs = timeEndMs - timeBeginMs;
-            var currentRowPosY = eventBegin.Index;
-            if (rows.ContainsKey(currentRowPosY))
-                if (rows[currentRowPosY] < timeBeginMs)
-                {
-                    rows[currentRowPosY] = timeEndMs;
-                    functions.Add(
-                        new Function(
-                            funcNames[(int)eventBegin.Index], timeBeginMs, (int)currentRowPosY,
-                            funcLengthMs, Color.GetRandomColor()));
-                }
-                else
-                {
-                    var stop = false;
-                    while (rows.TryGetValue(currentRowPosY, out var value) && !stop)
-                    {
-                        if (value < timeBeginMs) stop = true;
-                        else currentRowPosY++;
-                    }
-
-                    if (!stop) rows.Add(currentRowPosY, timeEndMs);
-                    else rows[currentRowPosY] = timeEndMs;
-
-                    functions.Add(
-                        new Function(
-                            funcNames[(int)eventBegin.Index], timeBeginMs,
-                            (int)currentRowPosY,
-                            funcLengthMs, Color.GetRandomColor()));
-                }
-            else
+            ref readonly var ev = ref events[i];
+            if (ev.EventType == EventType.Begin)
             {
-                rows.Add(currentRowPosY, timeEndMs);
-                functions.Add(
-                    new Function(
-                        funcNames[(int)eventBegin.Index], timeBeginMs, (int)currentRowPosY,
-                        funcLengthMs, Color.GetRandomColor()));
+                eventStack.Push(i);
+                continue;
             }
+
+            var beginIndex = eventStack.Pop();
+            ref readonly var beginEvent = ref events[beginIndex];
+
+            var timeBeginMs = TimeConverter.TicksToMilliseconds(beginEvent.TickTimestamp, nsInTick);
+            var timeEndMs = TimeConverter.TicksToMilliseconds(ev.TickTimestamp, nsInTick);
+            var name = names[(int)ev.Index];
+            result.Add(new Function(name, timeBeginMs, eventStack.Count, timeEndMs - timeBeginMs, Color.GetRandomColor()));
         }
 
-        return functions;
+        Debug.Assert(!eventStack.Any());
+
+        return result;
     }
 }
