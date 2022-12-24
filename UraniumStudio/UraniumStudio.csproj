@@ -21,7 +21,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Ruler.Wpf\src\RulerControl.Wpf\RulerControl.Wpf.csproj" />
-      <ProjectReference Include="..\RulerControl.Wpf\RulerControl.Wpf.csproj" />
     </ItemGroup>
 
 </Project>
