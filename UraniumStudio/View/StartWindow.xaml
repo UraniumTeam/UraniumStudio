@@ -5,19 +5,28 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
         Title="Uranium Studio" Height="450" Width="800" x:Name="Window" Background="DimGray"
-        WindowStartupLocation="CenterScreen">
-
-    <Window.Resources>
-        <Image x:Key="MyImage" Source="UraniumStudio/Resources/Images/" />
-    </Window.Resources>
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <StackPanel x:Name="Buttons" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
-        <Button x:Name="OpenExisting" Width="200" Height="120" Content="Open existing"
+        <Button x:Name="OpenExisting" Width="200" Height="160"
                 Background="LightGoldenrodYellow" FontWeight="SemiBold" FontSize="12" BorderBrush="Black"
                 BorderThickness="2"
-                PreviewMouseDown="OpenExisting_OnMouseLeftButtonDown" />
-        <Button x:Name="CreateNew" Width="200" Height="120" Content="Create new" Background="LightGoldenrodYellow"
-                FontWeight="SemiBold" FontSize="12" BorderBrush="Black" BorderThickness="2" 
-                PreviewMouseDown="CreateNew_OnMouseLeftButtonDown"/>
+                PreviewMouseDown="OpenExisting_OnMouseLeftButtonDown">
+            <StackPanel VerticalAlignment="Center">
+                <Image x:Name="OpenExistingImage" Source="/Resources/Images/OpenExistingIcon.png" MaxWidth="120"
+                       Stretch="Uniform" />
+                <Label HorizontalAlignment="Center" Content="Open Existing" FontSize="14" Padding="2" />
+            </StackPanel>
+        </Button>
+        <Rectangle x:Name="Separator" Width="40" />
+        <Button x:Name="CreateNew" Width="200" Height="160" Background="LightGoldenrodYellow"
+                FontWeight="SemiBold" FontSize="12" BorderBrush="Black" BorderThickness="2"
+                PreviewMouseDown="CreateNew_OnMouseLeftButtonDown">
+            <StackPanel VerticalAlignment="Center">
+                <Image x:Name="CreateNewImage" Source="/Resources/Images/CreateNewIcon.png" MaxWidth="120"
+                       Stretch="Uniform" />
+                <Label HorizontalAlignment="Center" Content="Create New" FontSize="14" Padding="2" />
+            </StackPanel>
+        </Button>
     </StackPanel>
 </Window>

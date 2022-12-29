@@ -23,4 +23,19 @@
       <ProjectReference Include="..\Ruler.Wpf\src\RulerControl.Wpf\RulerControl.Wpf.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Resources\Images\UraniumSoftwareIcon.ico" />
+      <Resource Include="Resources\Images\UraniumSoftwareIcon.ico">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <None Remove="Resources\Images\CreateNewIcon.png" />
+      <Resource Include="Resources\Images\CreateNewIcon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <None Remove="Resources\Images\OpenExistingIcon.png" />
+      <Resource Include="Resources\Images\OpenExistingIcon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+    </ItemGroup>
+
 </Project>
