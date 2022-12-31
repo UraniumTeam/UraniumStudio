@@ -65,7 +65,7 @@ public static class FileParser
             var timeBeginMs = TimeConverter.TicksToMilliseconds(beginEvent.TickTimestamp, nsInTick);
             var timeEndMs = TimeConverter.TicksToMilliseconds(ev.TickTimestamp, nsInTick);
             var name = names[(int)ev.Index];
-            result.Add(new Function(name, timeBeginMs, eventStack.Count, timeEndMs - timeBeginMs, Color.GetRandomColor()));
+            result.Add(new Function(name, timeBeginMs, eventStack.Count, timeEndMs - timeBeginMs, Colors.GetRandomColor()));
         }
 
         Debug.Assert(!eventStack.Any());
