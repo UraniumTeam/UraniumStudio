@@ -9,7 +9,7 @@ public class MainWindowViewModel : BaseViewModel
 {
 	public IEnumerable<int> MajorStep { get; }
 	public Func<double, double> ValueStepTransform { get; }
-	
+
 	public ScaleTransform GlobalScaleTransform { get; }
 
 	string _unit = null!;

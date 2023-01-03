@@ -16,17 +16,17 @@ namespace UraniumStudio.View;
 
 public partial class MainWindow
 {
-	readonly double _maxThreadsWidth;
-	Point _targetPoint;
-	FrameworkElement? _targetElement;
-	UIElement? _selectedElement;
-	readonly ScaleTransform _globalScaleTransform;
+	private readonly double maxThreadsWidth;
+	private Point targetPoint;
+	private FrameworkElement? targetElement;
+	private UIElement? selectedElement;
+	private readonly ScaleTransform globalScaleTransform;
 
 	public MainWindow()
 	{
 		InitializeComponent();
 		var viewModel = new MainWindowViewModel();
-		_globalScaleTransform = viewModel.GlobalScaleTransform;
+		globalScaleTransform = viewModel.GlobalScaleTransform;
 
 		int index = 0;
 		double maxThreadHeight = 0;
@@ -43,10 +43,10 @@ public partial class MainWindow
 			var canvas = new Canvas { VerticalAlignment = VerticalAlignment.Top };
 			var canvasFunc = new Canvas
 			{
-				RenderTransform = _globalScaleTransform
+				RenderTransform = globalScaleTransform
 			};
 			BindingOperations.SetBinding(
-				canvasFunc, ScaleTransform.ScaleXProperty, new Binding("Value") { Source = _globalScaleTransform });
+				canvasFunc, ScaleTransform.ScaleXProperty, new Binding("Value") { Source = globalScaleTransform });
 			var canvasFuncNames = new Canvas();
 
 			var funcs = Renderer.GetCanvasesArray(Database.Functions[i]).Item1;
@@ -97,13 +97,13 @@ public partial class MainWindow
 
 		// if splitters created
 		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
-		_maxThreadsWidth = Renderer.GetMaxThreadsWidth(Database.Functions);
+		maxThreadsWidth = Renderer.GetMaxThreadsWidth(Database.Functions);
 	}
 
-	void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
+	private void File_OnPreviewMouseLeftButtonDown(object sender, RoutedEventArgs e) =>
 		FileButton.ContextMenu!.IsOpen = true;
 
-	void FileOpen_OnPreviewLeftButtonDown(object sender, MouseButtonEventArgs e)
+	private void FileOpen_OnPreviewLeftButtonDown(object sender, MouseButtonEventArgs e)
 	{
 		var dialog = new Microsoft.Win32.OpenFileDialog
 		{
@@ -112,12 +112,12 @@ public partial class MainWindow
 		dialog.ShowDialog();
 	}
 
-	void CanvasItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+	private void CanvasItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 	{
-		if (_selectedElement != null) _selectedElement.Effect = null;
-		_selectedElement = e.OriginalSource as FrameworkElement;
-		if (_selectedElement is not Rectangle) return;
-		_selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
+		if (selectedElement != null) selectedElement.Effect = null;
+		selectedElement = e.OriginalSource as FrameworkElement;
+		if (selectedElement is not Rectangle) return;
+		selectedElement!.Effect = new DropShadowEffect { Direction = 0, ShadowDepth = 0, Opacity = 10 };
 
 		InfoStackPanel.Children.Clear();
 		Stats.Show();
@@ -128,11 +128,11 @@ public partial class MainWindow
 		InfoStackPanel.Children.Add(new TextBlock { Text = "Function length: " + element?.Width, FontSize = 14 });
 	}
 
-	void MainWindow_OnMouseWheel(object sender, MouseWheelEventArgs e)
+	private void MainWindow_OnMouseWheel(object sender, MouseWheelEventArgs e)
 	{
 		const double minScale = 0;
 		const double maxScale = 100;
-		double scaleMultiplier = (double)1 / 5000 * _globalScaleTransform.ScaleX;
+		double scaleMultiplier = (double)1 / 5000 * globalScaleTransform.ScaleX;
 
 		double absDelta = Math.Abs(e.Delta * scaleMultiplier);
 		sbyte direction = e.Delta switch
@@ -142,13 +142,13 @@ public partial class MainWindow
 			_ => 0
 		};
 
-		if (_globalScaleTransform.ScaleX is > minScale and < maxScale)
+		if (globalScaleTransform.ScaleX is > minScale and < maxScale)
 		{
-			_globalScaleTransform.ScaleX += direction * absDelta;
+			globalScaleTransform.ScaleX += direction * absDelta;
 		}
 
-		Ruler.MaxValue = _maxThreadsWidth;
-		Ruler.Width = _maxThreadsWidth * _globalScaleTransform.ScaleX;
+		Ruler.MaxValue = maxThreadsWidth;
+		Ruler.Width = Ruler.MaxValue * globalScaleTransform.ScaleX;
 		for (int i = 0; i < ThreadsFunctions.Children.Count; i++)
 		{
 			if (ThreadsFunctions.Children[i] is not Canvas) continue;
@@ -162,36 +162,36 @@ public partial class MainWindow
 					= ((currentThreadCanvas.Children[0] as Canvas)!.Children[j] as Canvas)!.Children[0] as
 					FrameworkElement;
 
-				name!.MaxWidth = func!.ActualWidth * _globalScaleTransform.ScaleX;
-				Canvas.SetLeft(name, Canvas.GetLeft(func) * _globalScaleTransform.ScaleX);
+				name!.MaxWidth = func!.ActualWidth * globalScaleTransform.ScaleX;
+				Canvas.SetLeft(name, Canvas.GetLeft(func) * globalScaleTransform.ScaleX);
 			}
 		}
 
-		if (_globalScaleTransform.ScaleX <= minScale) _globalScaleTransform.ScaleX += absDelta;
-		if (_globalScaleTransform.ScaleX >= maxScale) _globalScaleTransform.ScaleX -= absDelta;
+		if (globalScaleTransform.ScaleX <= minScale) globalScaleTransform.ScaleX += absDelta;
+		if (globalScaleTransform.ScaleX >= maxScale) globalScaleTransform.ScaleX -= absDelta;
 
 		//CentringTransform.CenterX = e.GetPosition(ThreadsFunctions).X;
 	}
 
-	void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
+	private void CanvasFunctionsPanel_OnMouseDown(object sender, MouseButtonEventArgs e)
 	{
-		_targetElement = ThreadsFunctions;
-		if (_targetElement != null)
-			_targetPoint = e.GetPosition(_targetElement);
+		targetElement = ThreadsFunctions;
+		if (targetElement != null)
+			targetPoint = e.GetPosition(targetElement);
 	}
 
-	void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
+	private void CanvasFunctionsPanel_OnMouseMove(object sender, MouseEventArgs e)
 	{
-		if (e.LeftButton != MouseButtonState.Pressed || _targetElement == null) return;
+		if (e.LeftButton != MouseButtonState.Pressed || targetElement == null) return;
 		var pCanvas = e.GetPosition(CanvasFunctionsPanel);
 
-		double xOffset = pCanvas.X - _targetPoint.X;
+		double xOffset = pCanvas.X - targetPoint.X;
 		Canvas.SetLeft(ThreadsFunctions, xOffset);
 		Canvas.SetLeft(Ruler, xOffset);
 	}
 
-	void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)
+	private void CanvasFunctionsPanel_OnMouseUp(object sender, MouseButtonEventArgs e)
 	{
-		_targetElement = null;
+		targetElement = null;
 	}
 }
