@@ -92,7 +92,7 @@
                                 <ruler:Ruler x:Name="Ruler"
                                              HorizontalAlignment="Stretch"
                                              MaxValue="{Binding ActualWidth, ElementName=Window, Mode=OneTime}"
-                                             MarkerControlReference="{Binding ElementName=mainView}"
+                                             MarkerControlReference="{Binding ElementName=Window}"
                                              MajorStepValues="{Binding MajorStep}"
                                              ValueStepTransform="{Binding ValueStepTransform}"
                                              Canvas.Top="0" Canvas.Left="0"

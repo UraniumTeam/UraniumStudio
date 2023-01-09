@@ -72,6 +72,7 @@ public static class Renderer
 
 		return max + Function.Height;
 	}
+	// get max thread Height 
 
 	public static double GetMaxThreadsWidth(IEnumerable<List<Function>> threads)
 	{
