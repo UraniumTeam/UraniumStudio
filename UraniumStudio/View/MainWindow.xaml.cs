@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,7 +7,6 @@ using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using UraniumStudio.Data;
-using UraniumStudio.Model;
 using UraniumStudio.ViewModel;
 using Point = System.Windows.Point;
 
@@ -30,16 +28,9 @@ public partial class MainWindow
 
 		int index = 0;
 		double maxThreadHeight = 0;
-		var threadPaths = Database.ThreadPaths;
-		for (int i = 0; i < threadPaths.Count; i++)
+		var threads = Database.ThreadPaths.Count;
+		for (var i = 0; i < threads; i++)
 		{
-			Database.Functions.Add(new List<Function>());
-			Database.Functions[i].AddRange(FileParser.ParseFile(threadPaths[i]));
-		}
-
-		for (int i = 0; i < threadPaths.Count; i++)
-		{
-			string thread = threadPaths[i];
 			var canvas = new Canvas { VerticalAlignment = VerticalAlignment.Top };
 			var canvasFunc = new Canvas
 			{
@@ -48,31 +39,29 @@ public partial class MainWindow
 			BindingOperations.SetBinding(
 				canvasFunc, ScaleTransform.ScaleXProperty, new Binding("Value") { Source = globalScaleTransform });
 			var canvasFuncNames = new Canvas();
-
 			var funcs = Renderer.GetCanvasesArray(Database.Functions[i]).Item1;
 			var funcNames = Renderer.GetCanvasesArray(Database.Functions[i]).Item2;
-			maxThreadHeight += Renderer.GetMaxHeightOfThread(funcs);
-			foreach (var function in funcs)
-			{
-				canvasFunc.Children.Add(function);
-				Canvas.SetTop(canvasFunc, maxThreadHeight * i);
-			}
+			var funcHeight = Renderer.GetMaxHeightOfThread(funcs);
+			maxThreadHeight += funcHeight;
 
-			foreach (var function in funcNames)
+			for (var counter = 0; counter < funcs.Length; counter++)
 			{
-				canvasFuncNames.Children.Add(function);
-				Canvas.SetTop(canvasFuncNames, maxThreadHeight * i);
+				canvasFunc.Children.Add(funcs[counter]);
+				canvasFuncNames.Children.Add(funcNames[counter]);
 			}
 
 			canvas.Children.Add(canvasFunc);
 			canvas.Children.Add(canvasFuncNames);
-			double funcHeight = Renderer.GetMaxHeightOfThread(funcs);
+
 			var threadRowDefinition = new RowDefinition
-				{ Height = new GridLength(funcHeight), MinHeight = funcHeight };
+			{
+				Height = new GridLength(funcHeight),
+				MinHeight = funcHeight
+			};
 			var splitterRowDefinition = new RowDefinition { Height = GridLength.Auto, MinHeight = 8 };
 			var gridSplitter = new GridSplitter
 			{
-				Height = 3, Background = Brushes.White, Width = this.Width, //
+				Height = 3, Background = Brushes.White, Width = this.Width,
 				HorizontalAlignment = HorizontalAlignment.Stretch,
 				ShowsPreview = false, ResizeDirection = GridResizeDirection.Rows,
 				VerticalAlignment = VerticalAlignment.Center
@@ -85,17 +74,14 @@ public partial class MainWindow
 
 			canvas.SetValue(Grid.RowProperty, index);
 			index++;
-			//if splitters created
 			gridSplitter.SetValue(Grid.RowProperty, index);
 			index++;
-			//
 			Grid.SetRowSpan(gridSplitter, 1);
 
 			ThreadsFunctions.Children.Add(canvas);
 			ThreadsFunctions.Children.Add(gridSplitter);
 		}
 
-		// if splitters created
 		ThreadsFunctions.Children.RemoveAt(ThreadsFunctions.Children.Count - 1);
 		maxThreadsWidth = Renderer.GetMaxThreadsWidth(Database.Functions);
 	}
@@ -149,11 +135,11 @@ public partial class MainWindow
 
 		Ruler.MaxValue = maxThreadsWidth;
 		Ruler.Width = Ruler.MaxValue * globalScaleTransform.ScaleX;
-		for (int i = 0; i < ThreadsFunctions.Children.Count; i++)
+		for (var i = 0; i < ThreadsFunctions.Children.Count; i++)
 		{
 			if (ThreadsFunctions.Children[i] is not Canvas) continue;
 			var currentThreadCanvas = ThreadsFunctions.Children[i] as Canvas;
-			for (int j = 0; j < (currentThreadCanvas!.Children[1] as Canvas)!.Children.Count; j++)
+			for (var j = 0; j < (currentThreadCanvas!.Children[1] as Canvas)!.Children.Count; j++)
 			{
 				var name
 					= ((currentThreadCanvas.Children[1] as Canvas)!.Children[j] as Canvas)!.Children[0] as

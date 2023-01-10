@@ -6,6 +6,8 @@ namespace UraniumStudio.Utilities;
 
 public static class Colors
 {
+	public static int PaletteLength => Palette.Length;
+
 	public static Color GetRandomColor()
 	{
 		var rnd = new Random();

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media;
+using UraniumStudio.Data;
+using UraniumStudio.Model;
 
 namespace UraniumStudio.ViewModel;
 
@@ -12,15 +14,15 @@ public class MainWindowViewModel : BaseViewModel
 
 	public ScaleTransform GlobalScaleTransform { get; }
 
-	string _unit = null!;
+	private string unit = null!;
 
 	public string Unit
 	{
-		get => _unit;
+		get => unit;
 		set
 		{
-			if (_unit == value) return;
-			_unit = value;
+			if (unit == value) return;
+			unit = value;
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Unit)));
 		}
 	}
@@ -32,9 +34,15 @@ public class MainWindowViewModel : BaseViewModel
 		MajorStep = new[] { 1, 2, 5 };
 		ValueStepTransform = UpdateStepValues;
 		GlobalScaleTransform = new ScaleTransform();
+
+		for (var i = 0; i < Database.ThreadPaths.Count; i++)
+		{
+			Database.Functions.Add(new List<Function>());
+			Database.Functions[i].AddRange(FileParser.ParseFile(Database.ThreadPaths[i]));
+		}
 	}
 
-	double UpdateStepValues(double stepValue)
+	private double UpdateStepValues(double stepValue)
 	{
 		if (stepValue < 1)
 		{

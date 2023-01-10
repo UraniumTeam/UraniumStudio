@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -16,15 +17,16 @@ public static class Renderer
 		var functionCanvases = new Canvas[functions!.Count];
 		var functionNameCanvases = new Canvas[functions.Count];
 
-		for (int i = 0; i < functions.Count; i++)
+		for (var i = 0; i < functions.Count; i++)
 		{
 			var functionCanvas = new Canvas();
 			var functionNameCanvas = new Canvas();
 
 			var funcName = new TextBlock
 			{
-				Text = functions[i].Name, MaxWidth = rectangles[i].Width,
-				Name = "funcName"
+				Text = functions[i].Name,
+				MaxWidth = rectangles[i].Width,
+				Padding = new Thickness(3)
 			};
 
 			Canvas.SetLeft(rectangles[i], functions[i].StartPosX);
@@ -43,10 +45,10 @@ public static class Renderer
 		return new Tuple<Canvas[], Canvas[]>(functionCanvases, functionNameCanvases);
 	}
 
-	static Rectangle[] ConvertFunctionsToRectangles(IReadOnlyList<Function>? functions)
+	private static Rectangle[] ConvertFunctionsToRectangles(IReadOnlyList<Function>? functions)
 	{
 		var rectangles = new Rectangle[functions!.Count];
-		for (int i = 0; i < rectangles.Length; i++)
+		for (var i = 0; i < rectangles.Length; i++)
 		{
 			rectangles[i] = new Rectangle
 			{
@@ -65,14 +67,13 @@ public static class Renderer
 		double max = 0;
 		foreach (var f in functions)
 		{
-			double height = Canvas.GetTop(f.Children[0]);
+			var height = Canvas.GetTop(f.Children[0]) + Function.Height;
 			if (height > max)
 				max = height;
 		}
 
-		return max + Function.Height;
+		return max;
 	}
-	// get max thread Height 
 
 	public static double GetMaxThreadsWidth(IEnumerable<List<Function>> threads)
 	{
